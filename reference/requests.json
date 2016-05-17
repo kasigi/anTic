@@ -1,0 +1,9 @@
+{
+  "action":"get",
+  "tableName":"task",
+  "pkey":{
+    "projectType":"508"
+  },
+  "offset":10,
+  "count":10
+}

@@ -1,11 +1,10 @@
 {
-    "displayName":"",
+    "displayName":"Statuses",
     "description":"",
     "fields":{
-      "fieldName":{
+      "statusText":{
         "helpText":"",
-        "displayName":"SampleDisplayName",
-        "foreignKeyDisplayFields":["fkField1","fkField2"]
+        "displayName":"Status"
       }
     }
 }

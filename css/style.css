@@ -51,6 +51,38 @@
     background-color:rgb(140,6,6);
 }
 
+.ant-entryTable-outer {
+    margin-top: 20px;
+}
+
+
+
+
+/* Entry Table */
+
+.ant-entryTable .btn-group {
+    min-width: 120px;
+}
+
+
+
+.ant-entryTable tbody input,
+.ant-entryTable tbody select {
+    display: none;
+}
+
+.ant-entryTable tbody tr:hover input,
+.ant-entryTable tbody tr:hover select,
+tr.ant-entry-editPending select,
+tr.ant-entry-editPending input {
+    display: block;
+}
+
+.ant-entryTable tbody tr:hover .ant-entry-fieldDisplay,
+.ant-entry-editPending .ant-entry-fieldDisplay {
+    display: none;
+}
+
 
 
 

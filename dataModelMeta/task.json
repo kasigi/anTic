@@ -2,22 +2,14 @@
   "displayName":"Tasks",
   "description":"",
   "fields":{
-    "firstName":{
-      "helpText":"",
-      "displayName":"First Name"
+    "projectType":{
+      "helpText":"This is what sort of work needs to be done and what skill domain.",
+      "displayName":"Task Type"
     },
-    "lastName":{
-      "helpText":"",
-      "displayName":"Last Name"
-    },
-    "organization":{
-      "helpText":"",
-      "displayName":"Organization",
-      "foreignKeyDisplayFields":["organization"]
-    },
-    "emailAddress":{
-      "helpText":"",
-      "displayName":"eMail Address"
+    "person":{
+      "helpText":"This is the currently assigned user in the system who is working on the task",
+      "displayName":"Assigned Person",
+      "foreignKeyDisplayFields":["firstName","lastName"]
     }
   }
 }

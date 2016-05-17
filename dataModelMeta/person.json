@@ -1,11 +1,23 @@
 {
-    "displayName":"",
+    "displayName":"People",
     "description":"",
     "fields":{
-      "fieldName":{
+      "firstName":{
         "helpText":"",
-        "displayName":"SampleDisplayName",
-        "foreignKeyDisplayFields":["fkField1","fkField2"]
+        "displayName":"First Name"
+      },
+      "lastName":{
+        "helpText":"",
+        "displayName":"Last Name"
+      },
+      "organization":{
+        "helpText":"",
+        "displayName":"Organization",
+        "foreignKeyDisplayFields":["organization"]
+      },
+      "emailAddress":{
+        "helpText":"",
+        "displayName":"eMail Address"
       }
     }
 }
