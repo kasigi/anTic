@@ -83,7 +83,9 @@ tr.ant-entry-editPending input {
     display: none;
 }
 
-
+.ant-entryTable-outer tr td:last-child {
+    text-align:right;
+}
 
 
 
@@ -398,7 +400,7 @@ tr.ant-entry-editPending input {
     display: block;
     color: white;
     text-decoration: none;
-    padding: 40px 43px 43px 43px;
+    padding: 40px 43px 37px 43px;
     margin: 0;
     height: 100%;
     z-index: 50;
