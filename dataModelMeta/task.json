@@ -1,0 +1,23 @@
+{
+  "displayName":"Tasks",
+  "description":"",
+  "fields":{
+    "firstName":{
+      "helpText":"",
+      "displayName":"First Name"
+    },
+    "lastName":{
+      "helpText":"",
+      "displayName":"Last Name"
+    },
+    "organization":{
+      "helpText":"",
+      "displayName":"Organization",
+      "foreignKeyDisplayFields":["organization"]
+    },
+    "emailAddress":{
+      "helpText":"",
+      "displayName":"eMail Address"
+    }
+  }
+}

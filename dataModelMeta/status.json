@@ -1,0 +1,11 @@
+{
+    "displayName":"",
+    "description":"",
+    "fields":{
+      "fieldName":{
+        "helpText":"",
+        "displayName":"SampleDisplayName",
+        "foreignKeyDisplayFields":["fkField1","fkField2"]
+      }
+    }
+}

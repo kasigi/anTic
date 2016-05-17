@@ -1,0 +1,10 @@
+{
+    "displayName":"Statuses",
+    "description":"",
+    "fields":{
+      "statusText":{
+        "helpText":"",
+        "displayName":"Status"
+      }
+    }
+}
