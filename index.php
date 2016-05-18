@@ -27,22 +27,23 @@ include('includes/header.php');
                         <th>&nbsp;</th>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="dataRow in anT.currentTable.data">
+                            <tr ng-repeat="dataRow in anT.currentTable.data" ng-init="dataRowIndex = $index" ng-click="anT.setRecordEditPending($index)" ng-class="anT.recordEditPending.indexOf($index)>-1 ? 'ant-entry-editPending' : ''
+">
                                 <td ng-repeat="tableField in anT.currentTable.dataModel.fieldOrder">
-
-                                    <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]" >A Sample Title</span>
-                                    <input class="form-control" type="text" value="{{dataRow[tableField]}}" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)" >
-                                    <select class="form-control" name="select" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"  ng-model="dataRow[tableField]">
+                                    <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)"></span>
+                                    <span class="ant-entry-fieldDisplay" ng-bind="anT.getForeignKeyDisplayFieldsForRecordField(tableField,dataRowIndex)" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"></span>
+                                    <input class="form-control" ng-model="anT.currentTable.data[dataRowIndex][tableField]" type="text" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)" >
+                                    <select class="form-control" name="select" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"  ng-model="anT.currentTable.data[dataRowIndex][tableField]">
                                         <option value="{{fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}" ng-repeat="fkRow in anT.currentTable.fkdata[tableField]">{{fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyDisplayFields[0]]}}</option>
                                     </select>
                                 </td>
                                 <td>
                                     <!---->
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-success" aria-label="Save" disabled>
+                                        <button type="button" class="btn btn-success" aria-label="Save" ng-disabled="anT.recordEditPending.indexOf($index)==-1" ng-click="anT.saveRecord($index)">
                                             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                                         </button>
-                                        <button type="button" class="btn btn-info" aria-label="Undo" disabled>
+                                        <button type="button" class="btn btn-info" aria-label="Undo" ng-disabled="anT.recordEditPending.indexOf($index)==-1">
                                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
                                         </button>
                                         <button type="button" class="btn btn-danger" aria-label="Delete">

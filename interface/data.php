@@ -27,7 +27,11 @@ data
 
 
 if(isset($aRequest['pkey'])){
-    $primaryRecordKeys = json_decode($aRequest['pkey'],true);
+    if(!is_array($aRequest['pkey'])){
+        $primaryRecordKeys = json_decode($aRequest['pkey'],true);
+    }else{
+        $primaryRecordKeys = $aRequest['pkey'];
+    }
 }else{
     $primaryRecordKeys=[];
 }
@@ -86,7 +90,11 @@ foreach($primaryRecordKeys as $key=>$value){
 
 // If Data is being submitted, validate field list
 if(isset($aRequest['data'])){
-    $inputData = json_decode($aRequest['data'],true);
+    if(!is_array($aRequest['data'])){
+        $inputData = json_decode($aRequest['data'],true);
+    }else{
+        $inputData = $aRequest['data'];
+    }
     foreach($inputData as $key=>$value){
         if(!isset($dataModels[$aRequest['tableName']]['fields'][$key])){
             $returnData['error'] = "Invalid Fields in Data Request";
@@ -154,11 +162,12 @@ if($aRequest['action']=="delete"){
             $sqlWhere[] = " $key = :".$key."Value";
             $bindArray[':'.$key.'Value']=$value;
         }
-        $sql.=" WHERE ".implode(" AND ",$sqlWhere);
+        $sql.=" WHERE ".implode(" , ",$sqlWhere);
 
     }
 
     $sql = addLimits($sql);
+
 
 
     // Run Query
@@ -166,8 +175,18 @@ if($aRequest['action']=="delete"){
     foreach($bindArray as $bKey => $bValue){
          $statement->bindValue($bKey, $bindArray[$bKey]);
     }
-
-    $statement->execute();
+if($aRequest['action']=="set"){
+    $output['bindArray']=$bindArray;
+    $output['sql']=$sql;
+}
+    $success = $statement->execute();
+    if(!$success){
+        $output['status']="error";
+        $output['error']=$statement->errorCode();
+        $output['sqlError']=$statement->debugDumpParams();
+        echo json_encode($output);
+        die;
+    }
 
 // TODO: Add handling for new
 

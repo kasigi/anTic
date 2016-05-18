@@ -1,0 +1,10 @@
+{
+  "action":"set",
+  "tableName":"organization",
+  "pkey":{
+    "organization":"oge"
+  },
+  "data":{
+    "organization":"OGE"
+  }
+}
