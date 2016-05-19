@@ -253,7 +253,7 @@ if($aRequest['action']=="get") {
 
         // Process Results
         while ($data = $statement->fetch(PDO::FETCH_ASSOC))  {
-            $output['fk'][$fkTable][]=$data;
+            $output['fkdata'][$fkTable][]=$data;
         }
     }
 }

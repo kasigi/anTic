@@ -40,7 +40,7 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
 
 
 
-    anT.getForeignKeyDisplayFieldsForRecordField = function(fieldName,dataRowID){
+    anT.getForeignKeyDisplayFieldsForRecordField = function(fieldName,fieldValue){
 
         if(typeof(anT.currentTable.fkdata) != "undefined" && typeof(anT.currentTable.fkdata[fieldName])!= "undefined"){
 
@@ -48,20 +48,23 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
         var outputArray=[];
         var thisField = "";
         var fkMatchColumn = anT.currentTable.dataModel.fields[fieldName].foreignKeyColumns[0];
+        var fkTableName = anT.currentTable.dataModel.fields[fieldName].foreignKeyTable;
 
+        for (var b = 0; b < anT.currentTable.fkdata[fkTableName].length; b++) {
+            var fkData = anT.currentTable.fkdata[fkTableName][b];
 
-        for (b = 0; b < anT.currentTable.fkdata[fieldName].length; b++) {
-            var fkData = anT.currentTable.fkdata[fieldName][b];
-            if(fkData[fkMatchColumn] == anT.currentTable.data[dataRowID][fieldName]){
+            if(fkData[fkMatchColumn] == fieldValue){
                 for (i = 0; i < anT.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields.length; i++) {
                     thisField = anT.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields[i];
                     outputArray.push(fkData[thisField]);
                 }
             }
+
+
         }
         return outputArray.join(" ");
         }else{
-            return anT.currentTable.data[dataRowID][fieldName];
+            return fieldValue;
         }
     }//getForeignKeyDisplayFieldsForRecordField
 
@@ -110,8 +113,8 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
                     anT.currentTable.pkdata[row][keyName]=data['data'][row][keyName];
                 }
             }
-            if("fk" in data){
-                anT.currentTable.fkdata = data['fk'];
+            if("fkdata" in data){
+                anT.currentTable.fkdata = data['fkdata'];
             }else{
                 anT.currentTable.fkdata = {};
             }

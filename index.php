@@ -31,10 +31,10 @@ include('includes/header.php');
 ">
                                 <td ng-repeat="tableField in anT.currentTable.dataModel.fieldOrder">
                                     <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)"></span>
-                                    <span class="ant-entry-fieldDisplay" ng-bind="anT.getForeignKeyDisplayFieldsForRecordField(tableField,dataRowIndex)" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"></span>
+                                    <span class="ant-entry-fieldDisplay" ng-bind="anT.getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"></span>
                                     <input class="form-control" ng-model="anT.currentTable.data[dataRowIndex][tableField]" type="text" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)" >
                                     <select class="form-control" name="select" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"  ng-model="anT.currentTable.data[dataRowIndex][tableField]">
-                                        <option value="{{fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}" ng-repeat="fkRow in anT.currentTable.fkdata[tableField]">{{fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyDisplayFields[0]]}}</option>
+                                        <option ng-repeat="fkRow in anT.currentTable.fkdata[anT.currentTable.dataModel.fields[tableField].foreignKeyTable]" value="{{fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}">{{anT.getForeignKeyDisplayFieldsForRecordField(tableField,fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyColumns[0]])}}</option>
                                     </select>
                                 </td>
                                 <td>
