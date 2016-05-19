@@ -22,14 +22,14 @@ include('includes/header.php');
                 <div class="panel panel-default ant-entryTable-outer">
                     <table class="table table-striped ant-entryTable table-hover">
                         <thead>
-                        <th ng-repeat="tableField in anT.currentTable.dataModel.fieldOrder"><span ng-bind="anT.currentTable.dataModel.fields[tableField].displayName"></span> <span ng-show="anT.currentTable.dataModel.fields[tableField].helpText" data-toggle="tooltip" data-placement="bottom" title="{{anT.currentTable.dataModel.fields[tableField].helpText}}" class="text-primary glyphicon glyphicon-question-sign" aria-hidden="true" ></span>
+                        <th ng-attr-id="thID-{{ tableField }}" ng-repeat="tableField in anT.currentTable.dataModel.fieldOrder"><span ng-bind="anT.currentTable.dataModel.fields[tableField].displayName"></span> <span ng-show="anT.currentTable.dataModel.fields[tableField].helpText" data-toggle="tooltip" data-placement="bottom" title="{{anT.currentTable.dataModel.fields[tableField].helpText}}" class="text-primary glyphicon glyphicon-question-sign" aria-hidden="true" ></span>
                         </th>
-                        <th>&nbsp;</th>
+                        <th id="thID-controls">&nbsp;</th>
                         </thead>
                         <tbody>
                             <tr ng-repeat="dataRow in anT.currentTable.data" ng-init="dataRowIndex = $index" ng-click="anT.setRecordEditPending($index)" ng-class="anT.recordEditPending.indexOf($index)>-1 ? 'ant-entry-editPending' : ''
 ">
-                                <td ng-repeat="tableField in anT.currentTable.dataModel.fieldOrder">
+                                <td ng-attr-headers="thID-{{ tableField }}" ng-repeat="tableField in anT.currentTable.dataModel.fieldOrder">
                                     <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)"></span>
                                     <span class="ant-entry-fieldDisplay" ng-bind="anT.getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])" ng-if="anT.isForeignKey(tableField,anT.currentTableSelected)"></span>
                                     <input class="form-control" ng-model="anT.currentTable.data[dataRowIndex][tableField]" type="text" ng-if="anT.isNotForeignKey(tableField,anT.currentTableSelected)" >
@@ -37,7 +37,7 @@ include('includes/header.php');
                                         <option ng-repeat="fkRow in anT.currentTable.fkdata[anT.currentTable.dataModel.fields[tableField].foreignKeyTable]" value="{{fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}">{{anT.getForeignKeyDisplayFieldsForRecordField(tableField,fkRow[anT.currentTable.dataModel.fields[tableField].foreignKeyColumns[0]])}}</option>
                                     </select>
                                 </td>
-                                <td>
+                                <td headers="thID-controls">
                                     <!---->
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-success" aria-label="Save" ng-disabled="anT.recordEditPending.indexOf($index)==-1" ng-click="anT.saveRecord($index)">
