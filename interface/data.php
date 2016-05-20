@@ -132,10 +132,12 @@ if($aRequest['action']=="set"){
             die;
         }
         foreach($inputData as $key=>$value) {
-            $setArray[]=$key."=:".$key."DValue";
+            $setArray[]="`".$key."`=:".$key."DValue";
+            //$setArray[]="`".$key."`=\"".$value."\"";
+
             $bindArray[':'.$key.'DValue']=$value;
         }
-        $sql .= implode(" AND ",$setArray);
+        $sql .= implode(" , ",$setArray);
 
         }
 }// end get
@@ -175,15 +177,21 @@ if($aRequest['action']=="delete"){
     foreach($bindArray as $bKey => $bValue){
          $statement->bindValue($bKey, $bindArray[$bKey]);
     }
+
+/* Debugging temporary code */
 if($aRequest['action']=="set"){
-    $output['bindArray']=$bindArray;
-    $output['sql']=$sql;
+    //$output['bindArray']=$bindArray;
+    //$output['sql']=$sql;
+    //echo json_encode($output);
+
 }
+/* Debugging temporary code */
+
     $success = $statement->execute();
     if(!$success){
         $output['status']="error";
         $output['error']=$statement->errorCode();
-        $output['sqlError']=$statement->debugDumpParams();
+        $output['sqlError']=$statement->errorInfo();
         echo json_encode($output);
         die;
     }

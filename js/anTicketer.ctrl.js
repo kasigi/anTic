@@ -41,8 +41,7 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
 
 
     anT.getForeignKeyDisplayFieldsForRecordField = function(fieldName,fieldValue){
-
-        if(typeof(anT.currentTable.fkdata) != "undefined" && typeof(anT.currentTable.fkdata[fieldName])!= "undefined"){
+        if(typeof(anT.currentTable.fkdata) != "undefined" && typeof(anT.currentTable.fkdata[anT.currentTable.dataModel.fields[fieldName].foreignKeyTable])!= "undefined"){
 
 
         var outputArray=[];
@@ -54,6 +53,7 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
             var fkData = anT.currentTable.fkdata[fkTableName][b];
 
             if(fkData[fkMatchColumn] == fieldValue){
+
                 for (i = 0; i < anT.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields.length; i++) {
                     thisField = anT.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields[i];
                     outputArray.push(fkData[thisField]);
