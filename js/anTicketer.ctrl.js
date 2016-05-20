@@ -1,4 +1,4 @@
-angular.module('anTicketer').controller("MainController", function($scope, $http) {
+angular.module('anTicketer').controller("MainController",function($scope, $route,$location, $routeParams, $http) {
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
     $scope.dataModel = {};
     $scope.currentTableSelected = "";
@@ -9,6 +9,7 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
     $scope.currentTable.pkdata = {};
     $scope.recordEditPending = [];
     // Initial Run
+    console.log($routeParams.currentTableSelected);
 
         // Get data model
 
@@ -19,13 +20,17 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
         console.log(data);
         $scope.dataModel = data;
         $scope.tableList = [];
+        $scope.tableIndex = [];
         jQuery.each(data,function(index,value){
-            if(firstRun == true){
-                $scope.currentTableSelected = index;
-                firstRun = false;
-            }
             $scope.tableList.push({"tableName":index,"displayName":value.displayName});
+            $scope.tableIndex.push(index);
         });
+
+        if(typeof $routeParams.currentTableSelected  != "undefined" && $scope.tableIndex.indexOf($routeParams.currentTableSelected)>-1){
+            $scope.currentTableSelected = $routeParams.currentTableSelected;
+        }else{
+            $scope.currentTableSelected = $scope.tableList[0]['tableName'];
+        };
 
         //$scope.myData.fromServer = data.title;
         $scope.selectTable();
@@ -74,6 +79,8 @@ angular.module('anTicketer').controller("MainController", function($scope, $http
     // Function Select Table Data
     $scope.selectTable = function(){
         $scope.currentTable.dataModel= $scope.dataModel[$scope.currentTableSelected];
+        //route.updateParams("table",$scope.currentTableSelected);
+        $location.search('currentTableSelected', $scope.currentTableSelected);
         $scope.getAllForTableData($scope.currentTableSelected);
     }// end selectTable
 

@@ -3,10 +3,12 @@ config(function($routeProvider){
 
     $routeProvider
     // route for the contact page
-        .when('/', {
+        .when('/table/', {
             templateUrl : 'partials/table.html',
-            controller  : 'MainController'
-        });
+            controller  : 'MainController',
+            reloadOnSearch : false
+        })
+        .otherwise( { redirectTo: "/table" });
 
 });
 
