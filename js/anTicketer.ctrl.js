@@ -209,7 +209,25 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
                 $scope.recordEditPending.splice(updatedIndex, 1);
             }
 
-        });
+            if(typeof $scope.currentTable.pkdata[dataRowID] == "undefined") {
+                var newPKData = {};
+                for(var keyID in $scope.currentTable.dataModel.primaryKey){
+                    keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+                    if($scope.currentTable.dataModel.fields[keyName].auto_increment == true){
+                        if(typeof data['insertedID'] != "undefined"){
+                            newPKData[keyName] = data['insertedID'];
+                            $scope.currentTable.data[dataRowID][keyName] = data['insertedID'];
+                            console.log([keyName,data['insertedID']]);
+                        }
+                    }else{
+                        $scope.currentTable.pkdata[dataRowID][keyName]=tableData.data[fieldName];
+                    }
+                }
+                $scope.currentTable.pkdata.push(newPKData);
+            }
+
+
+            });
         responsePromise.error(function(data, status, headers, config) {
             alert("AJAX failed!");
         });

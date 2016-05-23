@@ -213,9 +213,6 @@ if($aRequest['action']!=="add"){
         die;
     }
 
-    if($aRequest['action']!=="add"){
-        $output['insertedID'] = $db->lastInsertId();
-        }
 
     // Process Results
     $output = null;
@@ -224,6 +221,9 @@ if($aRequest['action']!=="add"){
         $output['data'][]=$data;
     }
 
+    if($aRequest['action']=="add"){
+        $output['insertedID'] = $db->lastInsertId();
+    }
 
 
 
