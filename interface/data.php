@@ -154,21 +154,47 @@ if($aRequest['action']=="delete"){
 }// end get
 
 
+if($aRequest['action']=="add") {
+    // INSERT INTO tbl_name (col1,col2) VALUES(15,col1*2);
+
+    $sql = "INSERT INTO $targetTable ";
+    unset($setArray);
+    unset($setArrayFields);
+    if(count($inputData)==0){
+        $returnData['error'] = "Data must be supplied for the Update Action";
+        echo $returnData;
+        die;
+    }
+    foreach($inputData as $key=>$value) {
+        $setArrayFields[]="`".$key."`";
+        $setArray[]=":".$key."DValue";
+        //$setArray[]="`".$key."`=\"".$value."\"";
+
+        $bindArray[':'.$key.'DValue']=$value;
+    }
+    $sql .= "(".implode(" , ",$setArrayFields).") VALUES (". implode(" , ",$setArray).")";
+}// end add
+
 
 
 // Common Code
+if($aRequest['action']!=="add"){
+
+    unset($sqlWhere);
     if(count($primaryRecordKeys)>0){
-        // get one record
-        unset($sqlWhere);
+        // target one record with primary keys
+
         foreach($primaryRecordKeys as $key=>$value) {
             $sqlWhere[] = " $key = :".$key."Value";
             $bindArray[':'.$key.'Value']=$value;
         }
-        $sql.=" WHERE ".implode(" , ",$sqlWhere);
+        $sql.=" WHERE ".implode(" AND ",$sqlWhere);
 
     }
 
     $sql = addLimits($sql);
+}
+
 
 
 
@@ -177,15 +203,6 @@ if($aRequest['action']=="delete"){
     foreach($bindArray as $bKey => $bValue){
          $statement->bindValue($bKey, $bindArray[$bKey]);
     }
-
-/* Debugging temporary code */
-if($aRequest['action']=="set"){
-    //$output['bindArray']=$bindArray;
-    //$output['sql']=$sql;
-    //echo json_encode($output);
-
-}
-/* Debugging temporary code */
 
     $success = $statement->execute();
     if(!$success){
@@ -196,7 +213,9 @@ if($aRequest['action']=="set"){
         die;
     }
 
-// TODO: Add handling for new
+    if($aRequest['action']!=="add"){
+        $output['insertedID'] = $db->lastInsertId();
+        }
 
     // Process Results
     $output = null;
@@ -204,16 +223,6 @@ if($aRequest['action']=="set"){
         $output['status']="success";
         $output['data'][]=$data;
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -265,20 +274,6 @@ if($aRequest['action']=="get") {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

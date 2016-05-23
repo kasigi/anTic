@@ -5,19 +5,10 @@ config(function($routeProvider){
     // route for the contact page
         .when('/table/', {
             templateUrl : 'partials/table.html',
-            controller  : 'MainController',
+            controller  : 'TableController',
             reloadOnSearch : false
         })
         .otherwise( { redirectTo: "/table" });
 
 });
-
-/*
-
-
-
-
-
- */
-
 

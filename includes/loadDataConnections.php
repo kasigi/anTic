@@ -66,6 +66,12 @@ function buildDataModels(){
                     if($data['Key']=="PRI"){
                         $dataModels[$tableName]['primaryKey'][]=$data['Field'];
                     }
+                    if(strpos($data['Extra'],"auto_increment")!==false){
+                        $dataModels[$tableName]['fields'][$data['Field']]['auto_increment']=true;
+                    }else{
+                        $dataModels[$tableName]['fields'][$data['Field']]['auto_increment']=false;
+                    }
+
                 }
             }
             // If no primary key is defined assume that all fields are required

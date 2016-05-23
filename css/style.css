@@ -61,7 +61,7 @@
 /* Entry Table */
 
 .ant-entryTable .btn-group {
-    min-width: 120px;
+    min-width: 160px;
 }
 
 
@@ -86,6 +86,7 @@ tr.ant-entry-editPending input {
 .ant-entryTable-outer tr td:last-child {
     text-align:right;
 }
+
 
 
 

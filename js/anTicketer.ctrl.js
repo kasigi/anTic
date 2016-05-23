@@ -1,4 +1,4 @@
-angular.module('anTicketer').controller("MainController",function($scope, $route,$location, $routeParams, $http) {
+angular.module('anTicketer').controller("TableController",function($scope, $route,$location, $routeParams, $http) {
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
     $scope.dataModel = {};
     $scope.currentTableSelected = "";
@@ -8,6 +8,7 @@ angular.module('anTicketer').controller("MainController",function($scope, $route
     $scope.currentTable.fkdata = {};
     $scope.currentTable.pkdata = {};
     $scope.recordEditPending = [];
+    $scope.recordDeletePending = [];
     // Initial Run
     console.log($routeParams.currentTableSelected);
 
@@ -124,10 +125,8 @@ angular.module('anTicketer').controller("MainController",function($scope, $route
             }else{
                 $scope.currentTable.fkdata = {};
             }
-
             console.log($scope.currentTable);
 
-            //$scope.myData.fromServer = data.title;
         });
         responsePromise.error(function(data, status, headers, config) {
             alert("AJAX failed!");
@@ -145,26 +144,61 @@ angular.module('anTicketer').controller("MainController",function($scope, $route
 
 
 
-    $scope.saveRecord = function(dataRowID){
-        console.log($scope.currentTable.data[dataRowID]);
-
+    $scope.getRecord = function(dataRowID){
         var tableData = {};
         tableData.tableName = $scope.currentTableSelected;
-        tableData.action = "set";
+        tableData.action = "get";
         tableData.pkey = {};
-        tableData.data = {};
+
         var keyName = "";
         for(var keyID in $scope.currentTable.dataModel.primaryKey){
             keyName = $scope.currentTable.dataModel.primaryKey[keyID];
             tableData.pkey[keyName]=$scope.currentTable.pkdata[dataRowID][keyName];
         }
+        var responsePromise = $http.post("interface/data.php",tableData);
+        responsePromise.success(function(data, status, headers, config) {
+            $scope.currentTable.data[dataRowID]=data['data'][0];
+        });
+        responsePromise.error(function(data, status, headers, config) {
+            alert("AJAX failed!");
+        });
+
+    }// end getRecord
+
+
+
+    $scope.saveRecord = function(dataRowID){
+        console.log($scope.currentTable.data[dataRowID]);
+
+        var tableData = {};
+        tableData.tableName = $scope.currentTableSelected;
+        tableData.data = {};
+        var keyName = "";
+
+
+        if(typeof $scope.currentTable.pkdata[dataRowID] == "undefined"){
+            // New record
+            tableData.action = "add";
+
+
+        }else{
+            // Edit extant record
+            tableData.action = "set";
+            tableData.pkey = {};
+
+            for(var keyID in $scope.currentTable.dataModel.primaryKey){
+                keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+                tableData.pkey[keyName]=$scope.currentTable.pkdata[dataRowID][keyName];
+            }
+        }
+
+
 
         for(var fieldName in $scope.currentTable.dataModel.fields){
             tableData.data[fieldName]=$scope.currentTable.data[dataRowID][fieldName];
         }
-        console.log("Planning to Send");
-        console.log(tableData);
-        console.log("Sending");
+
+
         var responsePromise = $http.post("interface/data.php",tableData);
 
         responsePromise.success(function(data, status, headers, config) {
@@ -179,8 +213,83 @@ angular.module('anTicketer').controller("MainController",function($scope, $route
         responsePromise.error(function(data, status, headers, config) {
             alert("AJAX failed!");
         });
-
     }
+
+
+    $scope.addRecord = function(){
+        var newRecord = {};
+        for (var fieldID in $scope.currentTable.dataModel.fieldOrder){
+            var fieldName = $scope.currentTable.dataModel.fieldOrder[fieldID];
+            if($scope.currentTable.dataModel.fields[fieldName].default != null){
+
+                // If a default value is defined by the table, use that
+                newRecord[fieldName]=$scope.currentTable.dataModel.fields[fieldName].default;
+
+            }else if(typeof $scope.currentTable.dataModel.fields[fieldName].foreignKeyColumns != "undefined"){
+
+                // If FK, select first option in FK
+                var firstForeignKeyColumn = $scope.currentTable.dataModel.fields[fieldName].foreignKeyColumns[0];
+                var foreignKeyTable = $scope.currentTable.dataModel.fields[fieldName].foreignKeyTable;
+                newRecord[fieldName]=$scope.currentTable.fkdata[foreignKeyTable][0][firstForeignKeyColumn];
+
+
+            }else{
+                // Default to ""
+                newRecord[fieldName]="";
+            }
+        }
+
+        var newIndex = $scope.currentTable.data.push(newRecord) - 1;
+        $scope.setRecordEditPending(newIndex);
+    }// end addRecord
+
+
+
+    $scope.recordPrepareDelete = function(dataRowID){
+
+        if($scope.recordDeletePending.indexOf(dataRowID)==-1){
+            $scope.recordDeletePending.push(dataRowID);
+        }
+
+    } //recordPrepareDelete
+
+
+    $scope.deleteRecord = function(dataRowID){
+
+
+        var tableData = {};
+        tableData.tableName = $scope.currentTableSelected;
+        tableData.action = "delete";
+        tableData.pkey = {};
+
+        var keyName = "";
+        for(var keyID in $scope.currentTable.dataModel.primaryKey){
+            keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+            tableData.pkey[keyName]=$scope.currentTable.pkdata[dataRowID][keyName];
+        }
+
+
+        var responsePromise = $http.post("interface/data.php",tableData);
+        responsePromise.success(function(data, status, headers, config) {
+
+            // Remove from data object
+            //delete $scope.currentTable.data[dataRowID];
+            $scope.currentTable.data.splice(dataRowID,1);
+            // Remove from Primary Key Index
+            $scope.currentTable.pkdata.splice(dataRowID,1);
+            // Remove from pending delete
+            var deleteIndex = $scope.recordDeletePending.indexOf(dataRowID);
+            if(deleteIndex > -1){
+                $scope.recordDeletePending.splice(deleteIndex,1);
+            }
+
+        });
+        responsePromise.error(function(data, status, headers, config) {
+            alert("AJAX failed!");
+        });
+
+    }// end deleteRecord
+
 
 
 });

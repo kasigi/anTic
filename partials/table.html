@@ -7,7 +7,7 @@
         </select>
     </div>
     <div class="col-md-6">
-        <button class="btn btn-primary btn-lg pull-right" type="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Entry</button>
+        <button class="btn btn-primary btn-lg pull-right" type="button" ng-click="addRecord()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Entry</button>
     </div>
 
 </div>
@@ -28,22 +28,26 @@
                     <td ng-attr-headers="thID-{{ tableField }}" ng-repeat="tableField in currentTable.dataModel.fieldOrder">
                         <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]" ng-if="isNotForeignKey(tableField,currentTableSelected)"></span>
                         <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])" ng-if="isForeignKey(tableField,currentTableSelected)"></span>
-                        <input class="form-control" ng-model="currentTable.data[dataRowIndex][tableField]" type="text" ng-if="isNotForeignKey(tableField,currentTableSelected)" >
-                        <select class="form-control" name="select" ng-if="isForeignKey(tableField,currentTableSelected)"  ng-model="currentTable.data[dataRowIndex][tableField]">
+                        <input class="form-control" ng-model="dataRow[tableField]" type="text" ng-if="isNotForeignKey(tableField,currentTableSelected)" >
+                        <select class="form-control" name="select" ng-if="isForeignKey(tableField,currentTableSelected)"  ng-model="dataRow[tableField]">
                             <option ng-repeat="fkRow in currentTable.fkdata[currentTable.dataModel.fields[tableField].foreignKeyTable]" value="{{fkRow[currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}">{{getForeignKeyDisplayFieldsForRecordField(tableField,fkRow[currentTable.dataModel.fields[tableField].foreignKeyColumns[0]])}}</option>
                         </select>
                     </td>
                     <td headers="thID-controls">
                         <!---->
                         <div class="btn-group">
-                            <button type="button" class="btn btn-success" aria-label="Save" ng-disabled="recordEditPending.indexOf($index)==-1" ng-click="saveRecord($index)">
+                            <button type="button" class="btn btn-success" aria-label="Save" ng-disabled="recordEditPending.indexOf($index)==-1" ng-click="saveRecord($index)" ng-if="recordDeletePending.indexOf($index)==-1">
                                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                             </button>
-                            <button type="button" class="btn btn-info" aria-label="Undo" ng-disabled="recordEditPending.indexOf($index)==-1">
+                            <button type="button" class="btn btn-info" aria-label="Undo" ng-disabled="recordEditPending.indexOf($index)==-1" ng-click="getRecord($index)" ng-if="recordDeletePending.indexOf($index)==-1">
                                 <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
                             </button>
-                            <button type="button" class="btn btn-danger" aria-label="Delete">
+
+                            <button type="button" class="btn btn-danger" aria-label="Delete" ng-if="recordDeletePending.indexOf($index)==-1" ng-click="recordPrepareDelete($index)" >
                                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="btn btn-danger" aria-label="Confirm Delete" ng-click="deleteRecord($index)" ng-if="recordDeletePending.indexOf($index)!==-1" >
+                                Confirm Delete
                             </button>
                         </div>
 
