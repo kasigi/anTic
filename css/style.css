@@ -87,7 +87,9 @@ tr.ant-entry-editPending input {
     text-align:right;
 }
 
-
+.ant-entryTableColHeader {
+    cursor:pointer;
+}
 
 
 

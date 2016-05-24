@@ -1,10 +1,10 @@
-angular.module('anTicketer').controller("TableController",function($scope, $route,$location, $routeParams, $http) {
+angular.module('anTicketer').controller("TableController",function($scope, $route,$location, $routeParams, $http,$filter) {
     $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
     $scope.dataModel = {};
     $scope.currentTableSelected = "";
     $scope.currentTable = {};
     $scope.currentTable.dataModel = {};
-    $scope.currentTable.data = {};
+    $scope.currentTable.data = [];
     $scope.currentTable.fkdata = {};
     $scope.currentTable.pkdata = {};
     $scope.recordEditPending = [];
@@ -308,6 +308,34 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
 
     }// end deleteRecord
 
+
+    var orderBy = $filter('orderBy');
+    $scope.predicate = '';
+    $scope.reverse = true;
+    $scope.order = function(predicate) {
+        $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+        $scope.currentTable.data = orderBy($scope.currentTable.data, predicate, $scope.reverse);
+        $scope.predicate = predicate;
+        console.log(predicate);
+        $scope.rekeyPKData();
+        console.log($scope.currentTable);
+    };
+
+
+    $scope.rekeyPKData = function(){
+        //This function updates the pkdata array after a sort / filter operation
+        var newPKData = [];
+        for (var entryID in $scope.currentTable.data){
+            var newPKDataRow = {};
+            for(var pkFieldID in $scope.currentTable.dataModel.primaryKey){
+                var thisField = $scope.currentTable.dataModel.primaryKey[pkFieldID];
+                newPKDataRow[thisField]=$scope.currentTable.data[entryID][thisField];
+            }
+            newPKData.push(newPKDataRow);
+        }
+        $scope.currentTable.pkdata = newPKData;
+
+    }//rekeyPKData
 
 
 });
