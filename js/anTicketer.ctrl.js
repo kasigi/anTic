@@ -10,7 +10,6 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
     $scope.recordEditPending = [];
     $scope.recordDeletePending = [];
     // Initial Run
-    console.log($routeParams.currentTableSelected);
 
         // Get data model
 
@@ -29,12 +28,14 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
 
         if(typeof $routeParams.currentTableSelected  != "undefined" && $scope.tableIndex.indexOf($routeParams.currentTableSelected)>-1){
             $scope.currentTableSelected = $routeParams.currentTableSelected;
+            $scope.selectTable();
         }else{
             $scope.currentTableSelected = $scope.tableList[0]['tableName'];
+            $scope.selectTable();
+
         };
 
-        //$scope.myData.fromServer = data.title;
-        $scope.selectTable();
+
     });
     responsePromise.error(function(data, status, headers, config) {
         alert("AJAX failed!");

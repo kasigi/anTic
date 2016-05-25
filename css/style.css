@@ -83,7 +83,13 @@ tr.ant-entry-editPending input {
     display: none;
 }
 
-.ant-entryTable-outer tr td:last-child {
+.ant-entryTable-outer tr td:last-child,
+.ant-entryTable-outer tr th:last-child {
+    text-align:right;
+}
+
+.ant-entryTable-outer tr td:last-child .btn-group,
+.ant-entryTable-outer tr th:last-child .btn-group {
     text-align:right;
 }
 

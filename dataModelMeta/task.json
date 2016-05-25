@@ -12,5 +12,6 @@
       "displayName":"Assigned Person",
       "foreignKeyDisplayFields":["firstName","lastName"]
     }
-  }
+  },
+  "listViewDisplayFields": ["person","status","projectTypeID","title"]
 }
