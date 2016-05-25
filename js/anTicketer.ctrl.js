@@ -322,31 +322,45 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
         tableData.action = "delete";
         tableData.pkey = {};
 
-        var keyName = "";
-        for(var keyID in $scope.currentTable.dataModel.primaryKey){
-            keyName = $scope.currentTable.dataModel.primaryKey[keyID];
-            tableData.pkey[keyName]=$scope.currentTable.pkdata[dataRowID][keyName];
-        }
 
 
-        var responsePromise = $http.post("interface/data.php",tableData);
-        responsePromise.success(function(data, status, headers, config) {
-
-            // Remove from data object
-            //delete $scope.currentTable.data[dataRowID];
+        if(typeof $scope.currentTable.pkdata[dataRowID] == "undefined") {
+            // Record is new and has not yet been saved
             $scope.currentTable.data.splice(dataRowID,1);
-            // Remove from Primary Key Index
-            $scope.currentTable.pkdata.splice(dataRowID,1);
-            // Remove from pending delete
             var deleteIndex = $scope.recordDeletePending.indexOf(dataRowID);
             if(deleteIndex > -1){
                 $scope.recordDeletePending.splice(deleteIndex,1);
             }
+        }else{
+            var keyName = "";
+            for(var keyID in $scope.currentTable.dataModel.primaryKey){
+                keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+                tableData.pkey[keyName]=$scope.currentTable.pkdata[dataRowID][keyName];
+            }
 
-        });
-        responsePromise.error(function(data, status, headers, config) {
-            alert("AJAX failed!");
-        });
+            // Record is in database and needs to be deleted
+            var responsePromise = $http.post("interface/data.php",tableData);
+            responsePromise.success(function(data, status, headers, config) {
+
+                // Remove from data object
+                //delete $scope.currentTable.data[dataRowID];
+                $scope.currentTable.data.splice(dataRowID,1);
+                // Remove from Primary Key Index
+                $scope.currentTable.pkdata.splice(dataRowID,1);
+                // Remove from pending delete
+                var deleteIndex = $scope.recordDeletePending.indexOf(dataRowID);
+                if(deleteIndex > -1){
+                    $scope.recordDeletePending.splice(deleteIndex,1);
+                }
+
+            });
+            responsePromise.error(function(data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+        }
+
+
+
 
     }// end deleteRecord
 
