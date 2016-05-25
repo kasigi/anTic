@@ -16,9 +16,11 @@
 
 <div class="row">
     <div class="col-md-12">
+
         <div class="panel panel-default ant-entryTable-outer">
 
             <table class="table table-striped ant-entryTable table-hover">
+                <caption ng-if="currentTable.dataModel.description != ''" ng-bind="currentTable.dataModel.description">
                 <thead>
                     <tr>
                     <th ng-attr-id="thID-{{ tableField }}" ng-repeat="tableField in currentTable.dataModel.fieldOrder">
