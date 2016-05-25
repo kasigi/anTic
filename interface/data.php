@@ -183,7 +183,7 @@ if($aRequest['action']!=="add"){
     unset($sqlWhere);
     if(count($primaryRecordKeys)>0){
         // target one record with primary keys
-
+$output['pk']=$primaryRecordKeys;
         foreach($primaryRecordKeys as $key=>$value) {
             $sqlWhere[] = " $key = :".$key."Value";
             $bindArray[':'.$key.'Value']=$value;
@@ -209,6 +209,7 @@ if($aRequest['action']!=="add"){
         $output['status']="error";
         $output['error']=$statement->errorCode();
         $output['sqlError']=$statement->errorInfo();
+        $output['sqlError']['sql']=$sql;
         echo json_encode($output);
         die;
     }

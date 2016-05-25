@@ -1,6 +1,6 @@
 {
   "displayName":"Tasks",
-  "description":"",
+  "description":"Tasks and tickets applied to websites.",
   "fields":{
     "projectTypeID":{
       "helpText":"This is what sort of work needs to be done and what skill domain.",

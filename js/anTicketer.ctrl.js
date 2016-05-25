@@ -112,20 +112,30 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
         var responsePromise = $http.post("interface/data.php",tableData);
 
         responsePromise.success(function(data, status, headers, config) {
-            $scope.currentTable.data = data['data'];
+            if(typeof data['data'] != "undefined"){
+                // Table has data
+                $scope.currentTable.data = data['data'];
+            }else {
+                // Table is presently empty
+                $scope.currentTable.data = [];
+
+            }
             $scope.currentTable.pkdata = [];
+
             for (var row in data['data']){
+                $scope.currentTable.pkdata[row] = {};
                 for(var keyID in $scope.currentTable.dataModel.primaryKey){
                     var keyName = $scope.currentTable.dataModel.primaryKey[keyID];
-                    $scope.currentTable.pkdata[row] = {};
                     $scope.currentTable.pkdata[row][keyName]=data['data'][row][keyName];
                 }
             }
-            if("fkdata" in data){
+            if(data.hasOwnProperty("fkdata")){
                 $scope.currentTable.fkdata = data['fkdata'];
             }else{
                 $scope.currentTable.fkdata = {};
             }
+
+
             console.log($scope.currentTable);
 
         });
@@ -171,12 +181,14 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
     $scope.saveRecord = function(dataRowID){
         console.log($scope.currentTable.data[dataRowID]);
 
+        // Set up submission variables
         var tableData = {};
         tableData.tableName = $scope.currentTableSelected;
         tableData.data = {};
         var keyName = "";
 
 
+        // Determine if this is a new or existing entry to update
         if(typeof $scope.currentTable.pkdata[dataRowID] == "undefined"){
             // New record
             tableData.action = "add";
@@ -205,23 +217,33 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
         responsePromise.success(function(data, status, headers, config) {
             console.log(status);
             console.log(data);
+
+            // Remove the edit pending status of the row
             var updatedIndex = $scope.recordEditPending.indexOf(dataRowID);
             if (updatedIndex > -1) {
                 $scope.recordEditPending.splice(updatedIndex, 1);
             }
 
+            // Add Primary key if it does not exist
             if(typeof $scope.currentTable.pkdata[dataRowID] == "undefined") {
+
+                // Create new PKData Record
                 var newPKData = {};
+
+                // For each primary key field, add to PK Record
                 for(var keyID in $scope.currentTable.dataModel.primaryKey){
                     keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+
                     if($scope.currentTable.dataModel.fields[keyName].auto_increment == true){
+                        // If autoincrementing, get inserted ID from the database return and use it
                         if(typeof data['insertedID'] != "undefined"){
                             newPKData[keyName] = data['insertedID'];
                             $scope.currentTable.data[dataRowID][keyName] = data['insertedID'];
                             console.log([keyName,data['insertedID']]);
                         }
                     }else{
-                        $scope.currentTable.pkdata[dataRowID][keyName]=tableData.data[fieldName];
+                        // Set the data summarily if not autoincrementing
+                        newPKData[keyName]=tableData.data[fieldName];
                     }
                 }
                 $scope.currentTable.pkdata.push(newPKData);
@@ -236,7 +258,11 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
 
 
     $scope.addRecord = function(){
+
+        // Create the new record object
         var newRecord = {};
+
+        // Add the fields
         for (var fieldID in $scope.currentTable.dataModel.fieldOrder){
             var fieldName = $scope.currentTable.dataModel.fieldOrder[fieldID];
             if($scope.currentTable.dataModel.fields[fieldName].default != null){
@@ -258,8 +284,23 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
             }
         }
 
+
+        // Add the new record to the data
         var newIndex = $scope.currentTable.data.push(newRecord) - 1;
         $scope.setRecordEditPending(newIndex);
+
+        // Create the PK Index Record
+        /*
+        var newPKRecord = {};
+        for (var fieldID in $scope.currentTable.dataModel.primaryKey) {
+            var fieldName = $scope.currentTable.dataModel.primaryKey[fieldID];
+            newPKRecord[fieldName]=newRecord[fieldName];
+        }
+
+
+        $scope.currentTable.pkdata.push(newPKRecord) - 1;
+         */
+
     }// end addRecord
 
 

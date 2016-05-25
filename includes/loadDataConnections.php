@@ -40,6 +40,9 @@ function buildDataModels(){
         foreach($files as $file) {
             $tableName = basename($file,".json");
             $dataModels[$tableName] = json_decode(file_get_contents($file),true);
+            if(!isset($dataModels[$tableName]['displayName'])){
+                $dataModels[$tableName]['displayName'] = $tableName;
+            }
             //[$interim]
         }// Populate Load Default/Standard Values From Database Structure
 
@@ -74,9 +77,10 @@ function buildDataModels(){
 
                 }
             }
+
             // If no primary key is defined assume that all fields are required
-            if(count($dataModels[$tableName]['primaryKey'])==0){
-                foreach($dataModel['fields'] as $fieldName => $fieldData){
+            if(!isset($dataModels[$tableName]['primaryKey'])){
+                foreach($dataModels[$tableName]['fields'] as $fieldName => $fieldData){
                     $dataModels[$tableName]['primaryKey'][] = $fieldName;
                 }
             }
