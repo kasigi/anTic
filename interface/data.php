@@ -64,9 +64,9 @@ global $dataModels,$db;
 
 $settingsSet = include('../includes/loadDataConnections.php');
 
-buildDataModels();
+buildDataModels('data');
 
-if(!isset($dataModels[$aRequest['tableName']])){
+if(!isset($dataModels['data'][$aRequest['tableName']])){
     $returnData['error'] = "Invalid Table Selected";
     echo $returnData;
     die;
@@ -79,7 +79,7 @@ if(!isset($dataModels[$aRequest['tableName']])){
 
 // If $primaryRecordKeys are specified, validate against table definition
 foreach($primaryRecordKeys as $key=>$value){
-    if(!in_array($key,$dataModels[$aRequest['tableName']]['primaryKey'])){
+    if(!in_array($key,$dataModels['data'][$aRequest['tableName']]['primaryKey'])){
         $returnData['error'] = "Invalid Primary Key Request";
         echo $returnData;
         die;
@@ -96,7 +96,7 @@ if(isset($aRequest['data'])){
         $inputData = $aRequest['data'];
     }
     foreach($inputData as $key=>$value){
-        if(!isset($dataModels[$aRequest['tableName']]['fields'][$key])){
+        if(!isset($dataModels['data'][$aRequest['tableName']]['fields'][$key])){
             $returnData['error'] = "Invalid Fields in Data Request";
             echo $returnData;
             die;
@@ -234,7 +234,7 @@ if($aRequest['action']=="get") {
     // TODO: Foreign Key Data
     $foreignKeyTables = [];
     // look for Foreign Key fields
-    foreach($dataModels[$aRequest['tableName']]['fields'] as $field){
+    foreach($dataModels['data'][$aRequest['tableName']]['fields'] as $field){
         // Create list of foreignKeyTables and all required fields
         if(isset($field['foreignKeyTable'])){
             if(!isset($foreignKeyTables[$field['foreignKeyTable']])){

@@ -27,28 +27,32 @@ function initDB(){
 
 
 // This function will build a description of the data structure
-function buildDataModels(){
+function buildDataModels($dataType){
     global $dataModels;
 
     initDB();
 
+    if(!in_array($dataType,["data","system"])){
+        $dataType = "data";
+    }
+
     // Build the Data Models if they do not exist
-    if($dataModels == null){
+    if($dataModels[$dataType] == null){
         // Load Data Model Files
 
-        $files = glob('../dataModelMeta/*.{json}', GLOB_BRACE);
+        $files = glob('../dataModelMeta/'.$dataType.'/*.{json}', GLOB_BRACE);
         foreach($files as $file) {
             $tableName = basename($file,".json");
-            $dataModels[$tableName] = json_decode(file_get_contents($file),true);
-            if(!isset($dataModels[$tableName]['displayName'])){
-                $dataModels[$tableName]['displayName'] = $tableName;
+            $dataModels[$dataType][$tableName] = json_decode(file_get_contents($file),true);
+            if(!isset($dataModels[$dataType][$tableName]['displayName'])){
+                $dataModels[$dataType][$tableName]['displayName'] = $tableName;
             }
             //[$interim]
         }// Populate Load Default/Standard Values From Database Structure
 
 
         // Populate Columns from Table Structure
-        foreach($dataModels as $tableName => $dataModel){
+        foreach($dataModels[$dataType] as $tableName => $dataModel){
             global $db;
 
             $stmt = $db->prepare("DESCRIBE $tableName;");
@@ -58,40 +62,40 @@ function buildDataModels(){
             //var_dump($output);
             while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 if($data['Field']!=""){
-                    $dataModels[$tableName]['fieldOrder'][]=$data['Field'];
-                    $dataModels[$tableName]['fields'][$data['Field']]['type']=$data['Type'];
+                    $dataModels[$dataType][$tableName]['fieldOrder'][]=$data['Field'];
+                    $dataModels[$dataType][$tableName]['fields'][$data['Field']]['type']=$data['Type'];
                     if($data['Null']=="YES"){
-                        $dataModels[$tableName]['fields'][$data['Field']]['null']=true;
+                        $dataModels[$dataType][$tableName]['fields'][$data['Field']]['null']=true;
                     }else{
-                        $dataModels[$tableName]['fields'][$data['Field']]['null']=false;
+                        $dataModels[$dataType][$tableName]['fields'][$data['Field']]['null']=false;
                     }
-                    $dataModels[$tableName]['fields'][$data['Field']]['default']=$data['Default'];
+                    $dataModels[$dataType][$tableName]['fields'][$data['Field']]['default']=$data['Default'];
                     if($data['Key']=="PRI"){
-                        $dataModels[$tableName]['primaryKey'][]=$data['Field'];
+                        $dataModels[$dataType][$tableName]['primaryKey'][]=$data['Field'];
                     }
                     if(strpos($data['Extra'],"auto_increment")!==false){
-                        $dataModels[$tableName]['fields'][$data['Field']]['auto_increment']=true;
+                        $dataModels[$dataType][$tableName]['fields'][$data['Field']]['auto_increment']=true;
                     }else{
-                        $dataModels[$tableName]['fields'][$data['Field']]['auto_increment']=false;
+                        $dataModels[$dataType][$tableName]['fields'][$data['Field']]['auto_increment']=false;
                     }
 
                 }
             }
 
             // If no primary key is defined assume that all fields are required
-            if(!isset($dataModels[$tableName]['primaryKey'])){
-                foreach($dataModels[$tableName]['fields'] as $fieldName => $fieldData){
-                    $dataModels[$tableName]['primaryKey'][] = $fieldName;
+            if(!isset($dataModels[$dataType][$tableName]['primaryKey'])){
+                foreach($dataModels[$dataType][$tableName]['fields'] as $fieldName => $fieldData){
+                    $dataModels[$dataType][$tableName]['primaryKey'][] = $fieldName;
                 }
             }
 
             // Populate Default Values in Models
             if(!isset($dataModel['displayName'])){
-                $dataModels[$tableName]['displayName']=ucwords($tableName);
+                $dataModels[$dataType][$tableName]['displayName']=ucwords($tableName);
             }
-            foreach($dataModels[$tableName]['fields'] as $fieldMachineName=>$field){
+            foreach($dataModels[$dataType][$tableName]['fields'] as $fieldMachineName=>$field){
                 if(!isset($field['displayName'])){
-                    $dataModels[$tableName]['fields'][$fieldMachineName]['displayName']=ucwords($fieldMachineName);
+                    $dataModels[$dataType][$tableName]['fields'][$fieldMachineName]['displayName']=ucwords($fieldMachineName);
                 }
             }
 
@@ -111,14 +115,14 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         $stmt->execute();
         while ($data = $stmt->fetch(PDO::FETCH_ASSOC))  {
-            if(isset($dataModels[$data['TABLE_NAME']])){
+            if(isset($dataModels[$dataType][$data['TABLE_NAME']])){
 
-                $dataModels[$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyTable']=$data['REFERENCED_TABLE_NAME'];
-                $dataModels[$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyColumns'][]=$data['REFERENCED_COLUMN_NAME'];
+                $dataModels[$dataType][$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyTable']=$data['REFERENCED_TABLE_NAME'];
+                $dataModels[$dataType][$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyColumns'][]=$data['REFERENCED_COLUMN_NAME'];
 
                 // Set default FK display field
-                if(!isset($dataModels[$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyDisplayFields'])){
-                    $dataModels[$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyDisplayFields'][]=$data['REFERENCED_COLUMN_NAME'];
+                if(!isset($dataModels[$dataType][$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyDisplayFields'])){
+                    $dataModels[$dataType][$data['TABLE_NAME']]['fields'][$data['CONSTRAINT_NAME']]['foreignKeyDisplayFields'][]=$data['REFERENCED_COLUMN_NAME'];
                 }
             }
         }
@@ -127,7 +131,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
 
 
-    return json_encode($dataModels);
+    return json_encode($dataModels[$dataType]);
 
 }// end buildDataModels
 

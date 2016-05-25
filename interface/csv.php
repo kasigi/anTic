@@ -5,11 +5,16 @@ global $dataModels,$db;
 
 $settingsSet = include('../includes/loadDataConnections.php');
 
-buildDataModels();
+buildDataModels('data');
 
 if($_REQUEST['tableName']!=""){
 
     $targetTable = preg_replace("/[^a-zA-Z0-9\-_\.]/", "", $_REQUEST['tableName']);;
+
+    if(!in_array($targetTable,$dataModels['data'])){
+        echo "Invalid Selection";
+        exit;
+    }
 
     $fileName = $targetTable.".csv";
 
