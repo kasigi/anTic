@@ -1,4 +1,4 @@
-angular.module('anTicketer', ['ngRoute']).
+angular.module('anTicketer', ['ngRoute', 'ngAria']).
 config(function($routeProvider){
 
     $routeProvider

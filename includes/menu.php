@@ -17,7 +17,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Search" name="s" id="s3">
 				      <span class="input-group-btn">
-					<button class="btn btn-default" type="button">Search</button>
+					<button class="btn btn-default" type="submit">Search</button>
 				      </span>
                                 </div><!-- /input-group -->
                             </form>
@@ -25,7 +25,7 @@
                     </div><!-- end navbar-header-->
 
                     <div class="collapse navbar-collapse navbar-ex1-collapse">
-                        <ul id="menu-main-menu" class="nav navbar-nav"><li class="menu-item"><a title="View on GitHub" href="https://github.com/kasigi/anTicketer">View Source on GitHub</a></li>
+                        <ul class="nav navbar-nav"><li class="menu-item"><a title="View on GitHub" href="https://github.com/kasigi/anTicketer">View Source on GitHub</a></li>
                         </ul></div>
 
                 </nav>
@@ -36,7 +36,7 @@
                 <a href="/" title="Home"><img src="http://www.kasigi.com/wp-content/themes/tnjPortfolio2013/images/Small-White-Logo.png" alt="Tor N. Johnson Logo" class="tnj-headermenu-logo"></a>
                 <nav>
 
-                    <div class="menu-main-menu-container"><ul id="menu-main-menu" class="nav navbar-nav"><li class="menu-item"><a title="View on GitHub" href="https://github.com/kasigi/anTicketer">View Source on GitHub</a></li>
+                    <div class="menu-main-menu-container"><ul class="nav navbar-nav"><li class="menu-item"><a title="View on GitHub" href="https://github.com/kasigi/anTicketer">View Source on GitHub</a></li>
                         </ul></div>
                     <form class="navbar-form navbar-right hidden-sm hidden-md searchform" role="search" method="get" id="searchform" action="http://www.kasigi.com/">
                         <label class="tnj-accessable-hide" for="s">Search</label>
@@ -44,7 +44,7 @@
 
                             <input type="text" class="form-control" placeholder="Search" name="s" id="s">
 				      <span class="input-group-btn">
-					<button class="btn btn-default" type="button">Search</button>
+					    <button class="btn btn-default" type="submit">Search</button>
 				      </span>
                         </div><!-- /input-group -->
                     </form>
@@ -58,12 +58,12 @@
     <div class="container visible-sm visible-md">
         <div class="row">
             <div class="col-md-12 tnj-headermenu-under">
-                <form class="navbar-form navbar-right searchform" role="search" method="get" id="searchform2" action="/">
+                <form class="navbar-form navbar-right searchform" role="search" method="get" id="searchform2" action="http://www.kasigi.com/">
                     <label class="tnj-accessable-hide" for="s2">Search</label>
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search" name="s" id="s2">
 				      <span class="input-group-btn">
-					<button class="btn btn-default" type="button">Search</button>
+					<button class="btn btn-default" type="submit">Search</button>
 				      </span>
                     </div><!-- /input-group -->
                 </form>
