@@ -438,6 +438,7 @@ wp-content/plugins/hello.php
 
 ### OSX template
 .DS_Store
+._.DS_Store
 .AppleDouble
 .LSOverride
 
