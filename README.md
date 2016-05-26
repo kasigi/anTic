@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/kasigi/anTicketer.png?label=ready&title=Ready)](https://waffle.io/kasigi/anTicketer)
 # anTicketer
 This is a php + angular application that can be used to track issues in a project.
 
