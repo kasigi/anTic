@@ -1,6 +1,21 @@
 <?php
 
-$validRequests = array("get","set","delete","add");
+$validRequests = array("get","getall","set","delete","add");
+
+/*
+Action Notes
+
+get: Gets a record(s) and will retrieve all fields
+getall: Gets all records from a table but will limit fields to the listViewDisplayFields and primary key lists
+set: Updates a single existing record
+        (note - it is POSSIBLE for set to affect multiple identical records on tables without a primary key)
+add: Inserts a single record
+delete: Deletes a single record
+
+
+
+*/
+
 
 
 // Gather data from angular's post method
@@ -118,6 +133,34 @@ if($aRequest['action']=="get"){
     $sql = "SELECT * FROM $targetTable";
 }// end get
 
+
+if($aRequest['action']=="getall"){
+    $fieldArray = [];
+    $fieldListString = "*";
+    // Look for listViewDisplayFields
+    if(isset($dataModels['data'][$targetTable]['listViewDisplayFields'])){
+
+        // Add the manually specified display fields
+        foreach($dataModels['data'][$targetTable]['listViewDisplayFields'] as $fieldName){
+            if(!in_array($fieldName,$fieldArray)){
+                $fieldArray[]=$fieldName;
+            }
+        }
+
+        // Primary keys are mandatory fields and must be added if not already specified
+        foreach($dataModels['data'][$aRequest['tableName']]['primaryKey'] as $fieldName){
+            if(!in_array($fieldName,$fieldArray)){
+                $fieldArray[]=$fieldName;
+            }
+        }
+
+        $fieldListString = implode(", ",$fieldArray);
+    }
+
+    $sql = "SELECT $fieldListString FROM $targetTable";
+}// end get
+
+
 if($aRequest['action']=="set"){
     if(count($primaryRecordKeys) == 0){
         $returnData['error'] = "Primary Keys Required for Action";
@@ -226,11 +269,12 @@ $output['pk']=$primaryRecordKeys;
         $output['insertedID'] = $db->lastInsertId();
     }
 
+$output['sql']=$sql;
 
 
 // If get, retrieve the foreign key tables as well
 
-if($aRequest['action']=="get") {
+if($aRequest['action']=="get" || $aRequest['action']=="getall") {
     // TODO: Foreign Key Data
     $foreignKeyTables = [];
     // look for Foreign Key fields
@@ -275,8 +319,6 @@ if($aRequest['action']=="get") {
         }
     }
 }
-
-
 
 
 

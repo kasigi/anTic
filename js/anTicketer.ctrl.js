@@ -108,10 +108,11 @@ angular.module('anTicketer').controller("TableController",function($scope, $rout
     $scope.getAllForTableData = function(tableName){
         var tableData = {};
         tableData.tableName = tableName;
-        tableData.action = "get";
+        tableData.action = "getall";
         var responsePromise = $http.post("interface/data.php",tableData);
 
         responsePromise.success(function(data, status, headers, config) {
+console.log(data);
             if(typeof data['data'] != "undefined"){
                 // Table has data
                 $scope.currentTable.data = data['data'];

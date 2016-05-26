@@ -8,7 +8,7 @@
         "foreignKeyDisplayFields":["fkField1","fkField2"]
       }
     },
-    "listViewDisplayFields": ["person","status","projectTypeID","title"]
+    "listViewDisplayFields": ["person","status","projectTypeID","title"],
   "hasManyToMany":{
     "fieldName":{
       "helpText":"",
@@ -18,5 +18,6 @@
       "throughTable":"Tie Table"
     }
   },
-  "showChildForeignKeys":[]
+  "showChildForeignKeys":[],
+
 }

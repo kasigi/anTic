@@ -47,6 +47,16 @@ function buildDataModels($dataType){
             if(!isset($dataModels[$dataType][$tableName]['displayName'])){
                 $dataModels[$dataType][$tableName]['displayName'] = $tableName;
             }
+
+            if(isset($dataModels[$dataType][$tableName]['listViewDisplayFields'])){
+                // Clean the inputs as these will later be used in SQL
+                foreach($dataModels[$dataType][$tableName]['listViewDisplayFields'] as $key=> $fieldName){
+                    $dataModels[$dataType][$tableName]['listViewDisplayFields'][$key]=preg_replace("/[^a-zA-Z0-9\-_]/", "", $fieldName);
+                }
+
+            }
+
+
             //[$interim]
         }// Populate Load Default/Standard Values From Database Structure
 
@@ -62,6 +72,7 @@ function buildDataModels($dataType){
             //var_dump($output);
             while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 if($data['Field']!=""){
+                    $data['Field']=preg_replace("/[^a-zA-Z0-9\-_]/", "", $data['Field']); // Cleaning/safety
                     $dataModels[$dataType][$tableName]['fieldOrder'][]=$data['Field'];
                     $dataModels[$dataType][$tableName]['fields'][$data['Field']]['type']=$data['Type'];
                     if($data['Null']=="YES"){
@@ -85,7 +96,7 @@ function buildDataModels($dataType){
             // If no primary key is defined assume that all fields are required
             if(!isset($dataModels[$dataType][$tableName]['primaryKey'])){
                 foreach($dataModels[$dataType][$tableName]['fields'] as $fieldName => $fieldData){
-                    $dataModels[$dataType][$tableName]['primaryKey'][] = $fieldName;
+                    $dataModels[$dataType][$tableName]['primaryKey'][] = preg_replace("/[^a-zA-Z0-9\-_]/", "", $fieldName);
                 }
             }
 
