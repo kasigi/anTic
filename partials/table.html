@@ -40,12 +40,7 @@
                 <tr ng-repeat="dataRow in currentTable.data" ng-init="dataRowIndex = $index" ng-click="setRecordEditPending($index)" ng-class="recordEditPending.indexOf($index)>-1 ? 'ant-entry-editPending' : ''
 ">
                     <td ng-attr-headers="thID-{{ tableField }}" ng-repeat="tableField in currentTable.dataModel.fieldOrder">
-                        <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]" ng-if="isNotForeignKey(tableField,currentTableSelected)"></span>
-                        <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])" ng-if="isForeignKey(tableField,currentTableSelected)"></span>
-                        <input class="form-control" ng-model="dataRow[tableField]" type="text" ng-if="isNotForeignKey(tableField,currentTableSelected)" aria-label="{{tableField}}" >
-                        <select class="form-control" name="select" ng-if="isForeignKey(tableField,currentTableSelected)"  ng-model="dataRow[tableField]" aria-label="{{tableField}}">
-                            <option ng-repeat="fkRow in currentTable.fkdata[currentTable.dataModel.fields[tableField].foreignKeyTable]" value="{{fkRow[currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}">{{getForeignKeyDisplayFieldsForRecordField(tableField,fkRow[currentTable.dataModel.fields[tableField].foreignKeyColumns[0]])}}</option>
-                        </select>
+                        <tablefield></tablefield>
                     </td>
                     <td headers="thID-controls">
                         <!---->

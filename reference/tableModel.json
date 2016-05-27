@@ -5,7 +5,9 @@
       "fieldName":{
         "helpText":"",
         "displayName":"SampleDisplayName",
-        "foreignKeyDisplayFields":["fkField1","fkField2"]
+        "foreignKeyDisplayFields":["fkField1","fkField2"],
+        "fieldEditDisplayType":"email",
+        "fieldValidationRegex":"/#?[a-fA-F]{6}/"
       }
     },
     "listViewDisplayFields": ["person","status","projectTypeID","title"],
@@ -18,6 +20,6 @@
       "throughTable":"Tie Table"
     }
   },
-  "showChildForeignKeys":[],
+  "showChildForeignKeys":[]
 
 }

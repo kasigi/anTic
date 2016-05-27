@@ -1,0 +1,15 @@
+{
+  "mysqlDataTypeMap":{
+    "int":["tinyint","smallint","mediumint","int","bigint"],
+    "float":["float","double","decimal"],
+    "longtext":["text","mediumtext","longtext"],
+    "date":["date","datetime","time","timestamp"],
+    "boolean":["bool","boolean"]
+  },
+  "customValidDataTypes":{
+    "email":{},
+    "tel":{},
+    "url":{}
+  }
+}
+
