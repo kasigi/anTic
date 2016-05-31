@@ -1,7 +1,7 @@
 <form class="ant-entry-editPending" action="" id="ant-single-record-edit">
 
 
-    <div  ng-repeat="dataRow in currentTable.data" ng-init="dataRowIndex = $index" ng-model-options="{ debounce: 350 }" ng-click="setRecordEditPending($index)" ng-class="recordEditPending.indexOf($index)>-1 ? 'ant-entry-editPending' : ''
+    <div class="ant-entry-editPending-record" ng-repeat="dataRow in currentTable.data" ng-init="dataRowIndex = $index" ng-model-options="{ debounce: 350 }" ng-click="setRecordEditPending($index)" ng-class="recordEditPending.indexOf($index)>-1 ? 'ant-entry-editPending' : ''
 ">
         <div class="row" ng-attr-headers="thID-{{ tableField }}" ng-repeat="tableField in currentTable.dataModel.fieldOrder" >
             <div class="col-md-2">

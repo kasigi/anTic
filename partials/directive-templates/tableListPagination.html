@@ -5,7 +5,7 @@
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
-        <li ng-repeat="page in paginationOptions"><a data-target="{{page * displayCount}}" ng-click="setDisplayOffset(page)" aria-label="Page {{1 + (page / displayCount)}}">{{1 + (page / displayCount)}}</a></li>
+        <li ng-class="{true:'active',false:''}[page===displayOffset]" ng-repeat="page in paginationOptions"><a data-target="{{page * displayCount}}" ng-click="setDisplayOffset(page)" aria-label="Page {{1 + (page / displayCount)}}">{{1 + (page / displayCount)}}</a></li>
         <li  ng-if="displayOffset + displayCount < currentTable.recordTotalCount">
             <a data-target="" ng-click="setDisplayOffset(displayOffset + displayCount)" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>

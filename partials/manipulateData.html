@@ -29,6 +29,8 @@
     <div class="row">
         <div class="col-md-6">
 
+            <h1><small>Record for:</small> <span ng-bind="currentTable.dataModel.displayName"></span></h1>
+
         </div>
         <div class="col-md-6">
 
@@ -40,12 +42,15 @@
         <div class="col-md-12">
 
 
-            <div class="panel panel-default">
-                <ul class="nav nav-tabs" role="tablist">
+            <div class="panel panel-primary with-nav-tabs">
+                <div class="panel-heading clearfix">
+
+                <ul class="nav nav-tabs " role="tablist">
                     <li role="presentation" class="active"><a data-target="#editRecord" aria-controls="editRecord" role="tab" data-toggle="tab">Edit Record</a></li>
                     <li role="presentation"><a data-target="#editRecordLogs" aria-controls="editRecordLogs" role="tab" data-toggle="tab">View Log / Versions</a></li>
 
                 </ul>
+                    </div>
                 <div class="panel-body">
                     <!-- Tab panes -->
                     <div class="tab-content">

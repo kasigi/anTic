@@ -97,16 +97,32 @@ angular.module('anTicketer')
         $scope.initialSelectTable = function () {
             if(Object.keys($scope.fieldTypeMapping).length > 0 && Object.keys($scope.dataModel).length > 0 && $scope.firstRun == true){
                 $scope.firstRun = false;
-                $scope.selectTable();
+                $scope.selectTable(function(){
+                    // If a specific record has been requested in the url, switch to the singleRecord editing mode
+                    if (typeof $routeParams.specificRecord != "undefined") {
+                        var candidateRecord = parseInt($routeParams.specificRecord);
+                        if(typeof $scope.currentTable.data[candidateRecord] != "undefined"){
+                            $scope.editSingleRecord(candidateRecord);
+                        }
+                    }
+                    });
             }
         }// end initialSelectTable
 
 
-
         $scope.editAllRecord = function(){
             $scope.displayMode = "table";
+            $location.search('specificRecord',null);
             $scope.selectTable();
         }// end editAllRecord
+
+
+        $scope.editSingleRecord = function(dataRowID){
+            $scope.displayMode = "singleRecord";
+            $location.search('specificRecord',dataRowID);
+            $scope.getRecord(dataRowID);
+            // Build Primary Key Array to Get ONE record
+        }// end editSingleRecord
 
 
         $scope.setDisplayCount = function(displayCount){
@@ -151,6 +167,7 @@ angular.module('anTicketer')
 
         }//setDisplayOffset
 
+
         $scope.calculatePagination = function(){
             // Create an array that lists the various record offset numbers for a given table
             $scope.paginationOptions = [];
@@ -161,15 +178,6 @@ angular.module('anTicketer')
                 }
             }
         }// end calculatePagination
-
-
-
-        $scope.editSingleRecord = function(dataRowID){
-            $scope.displayMode = "singleRecord";
-
-            $scope.getRecord(dataRowID);
-            // Build Primary Key Array to Get ONE record
-        }// end editSingleRecord
 
 
         $scope.getForeignKeyDisplayFieldsForRecordField = function (fieldName, fieldValue) {
@@ -202,13 +210,14 @@ angular.module('anTicketer')
 
 
         // Function Select Table Data
-        $scope.selectTable = function () {
+        $scope.selectTable = function (callback) {
             //route.updateParams("table",$scope.currentTableSelected);
             $scope.currentTable.dataModel = $scope.dataModel[this.currentTableSelected];
             $location.search('currentTableSelected', this.currentTableSelected);
             $scope.currentTableSelected = this.currentTableSelected;
-            $scope.getAllForTableData(this.currentTableSelected);
+            $scope.getAllForTableData(this.currentTableSelected,callback);
         }// end selectTable
+
 
         $scope.fieldType = function (fieldName, tableName) {
 
@@ -241,7 +250,7 @@ angular.module('anTicketer')
         }
 
         // Function Load Table Data
-        $scope.getAllForTableData = function (tableName) {
+        $scope.getAllForTableData = function (tableName,callback) {
             var tableData = {};
             tableData.tableName = tableName;
             tableData.action = "getall";
@@ -287,6 +296,9 @@ angular.module('anTicketer')
 
                 $scope.calculatePagination();
                 $scope.checkDisplayOffsetAgainstRecordCount();
+                if(callback){
+                    callback();
+                };
                 console.log($scope.currentTable);
 
             });
@@ -521,6 +533,7 @@ angular.module('anTicketer')
 
         }// end deleteRecord
 
+
         $scope.rekeyPKData = function () {
             //This function updates the pkdata array after a sort / filter operation
             var newPKData = [];
@@ -536,7 +549,6 @@ angular.module('anTicketer')
 
         }//rekeyPKData
         
-
 
     })
     .directive("tablefield", function () {
