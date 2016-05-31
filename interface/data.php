@@ -157,7 +157,8 @@ if($aRequest['action']=="getall"){
         $fieldListString = implode(", ",$fieldArray);
     }
 
-    $sql = "SELECT $fieldListString FROM $targetTable";
+    $sql = "SELECT $fieldListString FROM $targetTable";  // This is the main query
+    $countSql = "SELECT count(*) as recordTotalCount FROM $targetTable"; // This is the query used to determine total number of records
 }// end get
 
 
@@ -252,7 +253,7 @@ $output['pk']=$primaryRecordKeys;
         $output['status']="error";
         $output['error']=$statement->errorCode();
         $output['sqlError']=$statement->errorInfo();
-        $output['sqlError']['sql']=$sql;
+        //$output['sqlError']['sql']=$sql;
         echo json_encode($output);
         die;
     }
@@ -263,13 +264,23 @@ $output['pk']=$primaryRecordKeys;
     while ($data = $statement->fetch(PDO::FETCH_ASSOC))  {
         $output['status']="success";
         $output['data'][]=$data;
+        //$output['sql']=$sql;
     }
+
+    $statement = $db->prepare($countSql);
+    $success = $statement->execute();
+    while ($data = $statement->fetch(PDO::FETCH_ASSOC))  {
+        $output['recordTotalCount']=$data['recordTotalCount'];
+        //$output['sql']=$sql;
+    }
+
+
 
     if($aRequest['action']=="add"){
         $output['insertedID'] = $db->lastInsertId();
     }
 
-$output['sql']=$sql;
+
 
 
 // If get, retrieve the foreign key tables as well
@@ -334,6 +345,7 @@ if($aRequest['action']=="get" || $aRequest['action']=="getall") {
 
 
 function addLimits($sql){
+    global $aRequest;
     if(isset($aRequest['offset']) || isset($aRequest['count'])){
         if(!isset($aRequest['count'])){
             $count=1000;

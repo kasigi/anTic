@@ -12,8 +12,12 @@
 
                 </th>
                 <th id="thID-controls">
+
                     <div class="btn-group" role="group" aria-label="Table-level Controls">
-                        <a class="btn btn-standard btn-xs" href="interface/csv.php?tableName={{ currentTableSelected }}"><span class="glyphicon glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download CSV</a>
+                        <select name="displayCount" class="btn btn-default" ng-model="displayCount" ng-change="setDisplayCount(displayCount)" ng-options="value for value in displayCountOptions">
+                        </select>
+
+                        <a class="btn btn-default" href="interface/csv.php?tableName={{ currentTableSelected }}"><span class="glyphicon glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download CSV</a>
                     </div>
 
                 </th>

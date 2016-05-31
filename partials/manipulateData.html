@@ -15,8 +15,13 @@
         </div>
     </div>
 
+    <div class="row" ng-if="currentTable.data.length > 0 && currentTable.recordTotalCount > currentTable.data.length">
+        <div class="col-md-12">
+            <tablelistpagination></tablelistpagination>
+        </div>
+    </div>
 
-</div>
+</div><!-- end table edit view -->
 
 
 <div class="ant-single-record-panel" ng-if="displayMode == 'singleRecord'">

@@ -6,6 +6,7 @@ angular.module('anTicketer')
         $scope.currentTable = {};
         $scope.currentTable.dataModel = {};
         $scope.currentTable.data = [];
+        $scope.currentTable.recordTotalCount = 0;
         $scope.currentTable.fkdata = {};
         $scope.currentTable.pkdata = {};
         $scope.recordEditPending = [];
@@ -13,10 +14,30 @@ angular.module('anTicketer')
         $scope.fieldTypeMapping = {};
         $scope.displayMode = "table";
         $scope.singleRecordTarget = {};
+        $scope.displayCountOptions = [5,10,50,100,250,1000,5000];
+        $scope.paginationOptions = [];
         // Initial Run
+        // Get initial number of records to display
+        if (typeof $routeParams.displayCount != "undefined") {
+            $routeParams.displayCount = parseInt($routeParams.displayCount);
+            if($scope.displayCountOptions.indexOf($routeParams.displayCount) > -1){
+                $scope.displayCount = $routeParams.displayCount;
+            }else{
+                $scope.displayCount = 1000;
+            }
+        } else {
+            $scope.displayCount = 1000;
+        }
+
+        // Get initial display records offset
+        if (typeof $routeParams.displayOffset != "undefined" && parseInt($routeParams.displayOffset) > -1) {
+            $scope.displayOffset = parseInt($routeParams.displayOffset);
+        } else {
+            $scope.displayOffset = 0;
+        }
+
 
         // Get data model
-
         var responsePromise = $http.get("interface/dataStructure.php");
         $scope.firstRun = true;
         responsePromise.success(function (data, status, headers, config) {
@@ -30,6 +51,7 @@ angular.module('anTicketer')
                 $scope.tableIndex.push(index);
             });
 
+            // Get initial current table selection
             if (typeof $routeParams.currentTableSelected != "undefined" && $scope.tableIndex.indexOf($routeParams.currentTableSelected) > -1) {
                 $scope.currentTableSelected = $routeParams.currentTableSelected;
             } else {
@@ -43,9 +65,9 @@ angular.module('anTicketer')
             alert("AJAX failed!");
         });
 
+        // Get meta data on possible field types
         var responsePromise2 = $http.get("dataModelMeta/validDataTypesMap.json");
         responsePromise2.success(function (data, status, headers, config) {
-
             console.log(data);
             $scope.fieldTypeMapping = data;
             $scope.initialSelectTable();
@@ -87,8 +109,64 @@ angular.module('anTicketer')
         }// end editAllRecord
 
 
+        $scope.setDisplayCount = function(displayCount){
+            var dataLength = $scope.currentTable.data.length;
+            $scope.displayCount = displayCount;
+
+            if(dataLength > displayCount){
+                // Data is LONGER than the desired display. The correct display can be achieved by trimming down the data array.
+                var amountToRemove = dataLength - displayCount;
+                $scope.checkDisplayOffsetAgainstRecordCount();
+                $scope.currentTable.data.splice(displayCount,amountToRemove);
+                $scope.currentTable.pkdata.splice(displayCount,amountToRemove);
+            }else{
+                // Data is equal to or shorter than the desired display. Data must be reloaded from the server
+                $scope.getAllForTableData($scope.currentTableSelected);
+            }
+            $scope.calculatePagination();
+            $location.search('displayCount', displayCount);
+
+        }//end setDisplayCount
+
+
+        $scope.checkDisplayOffsetAgainstRecordCount = function(){
+            // If there are fewer records to display than allowed by displayCount, show all and set offset back to 0
+            if($scope.displayCount > $scope.currentTable.recordTotalCount){
+                $scope.displayOffset = 0;
+                $location.search('displayOffset', 0);
+            }
+
+        }//checkDisplayOffsetAgainstRecordCount
+
+
+        $scope.setDisplayOffset = function(displayOffset){
+            displayOffset = parseInt(displayOffset);
+            if(displayOffset < 0){
+                displayOffset = 0;
+            }
+            $scope.displayOffset = displayOffset;
+
+            $location.search('displayOffset', displayOffset);
+            $scope.getAllForTableData($scope.currentTableSelected);
+
+        }//setDisplayOffset
+
+        $scope.calculatePagination = function(){
+            // Create an array that lists the various record offset numbers for a given table
+            $scope.paginationOptions = [];
+            if($scope.displayCount>0){
+                var pages = Math.ceil(this.currentTable.recordTotalCount / this.displayCount);
+                for(var q=0; q<pages; q++){
+                    $scope.paginationOptions.push(q*$scope.displayCount);
+                }
+            }
+        }// end calculatePagination
+
+
+
         $scope.editSingleRecord = function(dataRowID){
             $scope.displayMode = "singleRecord";
+
             $scope.getRecord(dataRowID);
             // Build Primary Key Array to Get ONE record
         }// end editSingleRecord
@@ -130,7 +208,6 @@ angular.module('anTicketer')
             $location.search('currentTableSelected', this.currentTableSelected);
             $scope.currentTableSelected = this.currentTableSelected;
             $scope.getAllForTableData(this.currentTableSelected);
-
         }// end selectTable
 
         $scope.fieldType = function (fieldName, tableName) {
@@ -168,6 +245,11 @@ angular.module('anTicketer')
             var tableData = {};
             tableData.tableName = tableName;
             tableData.action = "getall";
+
+            tableData.count = $scope.displayCount;
+            tableData.offset = $scope.displayOffset;
+            console.log(tableData);
+
             var responsePromise = $http.post("interface/data.php", tableData);
 
             responsePromise.success(function (data, status, headers, config) {
@@ -176,9 +258,16 @@ angular.module('anTicketer')
                 if (typeof data['data'] != "undefined") {
                     // Table has data
                     $scope.currentTable.data = data['data'];
+                    if(typeof data['recordTotalCount'] != "undefined"){
+                        $scope.currentTable.recordTotalCount = parseInt(data['recordTotalCount']);
+                    }else{
+                        $scope.currentTable.recordTotalCount = data['data'].length;
+                    }
+
                 } else {
                     // Table is presently empty
                     $scope.currentTable.data = [];
+                    $scope.currentTable.recordTotalCount = 0;
 
                 }
                 $scope.currentTable.pkdata = [];
@@ -196,6 +285,8 @@ angular.module('anTicketer')
                     $scope.currentTable.fkdata = {};
                 }
 
+                $scope.calculatePagination();
+                $scope.checkDisplayOffsetAgainstRecordCount();
                 console.log($scope.currentTable);
 
             });
@@ -219,6 +310,8 @@ angular.module('anTicketer')
             tableData.tableName = $scope.currentTableSelected;
             tableData.action = "get";
             tableData.pkey = {};
+            tableData.count = 1;
+            tableData.offset = 0;
 
             var keyName = "";
             for (var keyID in $scope.currentTable.dataModel.primaryKey) {
@@ -486,6 +579,15 @@ angular.module('anTicketer')
             templateUrl: 'partials/directive-templates/singleRecordEdit.html'
         }
     })
+    .directive("tablelistpagination",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/tableListPagination.html'
+        }
+    })
+
     .directive("tableselect",function(){
         return {
             restrict: 'E',

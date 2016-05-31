@@ -65,6 +65,7 @@ CREATE TABLE `anticUserGroup` (
   KEY `ixGroup` (`groupID`,`userID`),
   CONSTRAINT `fkUserID` FOREIGN KEY (`userID`) REFERENCES `anticUser` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+REPLACE INTO `anTicketer`.`anticUser` (`userID`, `email`, `firstName`, `lastName`) VALUES ('0', 'null@null', 'antic', 'antic');
 
 
 CREATE TABLE `anticSystemSettingType` (
@@ -81,15 +82,14 @@ CREATE TABLE `anticSystemSetting` (
   `systemSettingTypeID` INT NULL,
   `systemSettingValue` VARCHAR(1024) NULL,
   PRIMARY KEY (`systemSettingID`),
-  INDEX `index2` (`systemSettingTypeID` ASC),
-  CONSTRAINT `fkSystemSettingTypes`
+  INDEX `ixSystemSettingTypeID` (`systemSettingTypeID` ASC),
+  CONSTRAINT `anticSystemSettingType`
     FOREIGN KEY (`systemSettingTypeID`)
-    REFERENCES `anticSystemSettingTypes` (`systemSettingTypeID`)
+    REFERENCES `anticSystemSettingType` (`systemSettingTypeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
 
 
 CREATE TABLE `anticPermission` (
@@ -98,10 +98,12 @@ CREATE TABLE `anticPermission` (
   `groupID` int(11) DEFAULT NULL,
   `tableName` varchar(45) DEFAULT NULL,
   `pkArrayBaseJson` varchar(2048) DEFAULT NULL,
-  `permissionObject` blob,
+  `read` tinyint(1) DEFAULT NULL,
+  `write` tinyint(1) DEFAULT NULL,
+  `execute` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ixTablePK` (`tableName`,`pkArrayBaseJson`(767)),
-  KEY `fk_anticPermission_1_idx` (`userID`),
+  KEY `ixTablePK` (`tableName`,`pkArrayBaseJson`(255)),
+  KEY `ixUserID` (`userID`,`read`,`write`),
+  KEY `ixGroupID` (`groupID`,`tableName`,`pkArrayBaseJson`(255),`read`,`write`,`execute`),
   CONSTRAINT `fk_anticPermission_1` FOREIGN KEY (`userID`) REFERENCES `anticUser` (`userID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-

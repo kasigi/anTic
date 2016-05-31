@@ -7,7 +7,7 @@
 //
 // <a href="#"><span class="glyphicon glyphicon-star"></span> Star</a>
 
-@at-root {
+
   // Import the fonts
   @font-face {
     font-family: 'Glyphicons Halflings';
@@ -18,7 +18,7 @@
          url('./bootstrap/glyphicons-halflings-regular.ttf') format('truetype'),
          url('./bootstrap/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
   }
-}
+
 
 // Catchall baseclass
 .glyphicon {

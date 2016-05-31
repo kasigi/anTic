@@ -44,7 +44,8 @@
     <div ng-if="'longtext'==fieldType(tableField,currentTableSelected)">
         <!-- Longtext -->
         <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
-        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text"  ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" aria-label="{{tableField}}">
+        <textarea class="form-control" rows="6" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" aria-label="{{tableField}}"></textarea>
+
     </div>
 
 
