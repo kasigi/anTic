@@ -1,5 +1,5 @@
 [![Stories in Ready](https://badge.waffle.io/kasigi/anTicketer.png?label=ready&title=Ready)](https://waffle.io/kasigi/anTicketer)
-# anTicketer
+# anTic, the Ticketing System and General CMS
 This is a php + angular application that can be used to track issues in a project.
 
 This is not intended as a fully supported long-term project but a one-off creation with two goals:
@@ -10,7 +10,7 @@ This is not intended as a fully supported long-term project but a one-off creati
 
 ## Known Limitations
 
-The system is able to support foreign keys and tables both with and without primary keys.  HOWEVER, support for multi-field primary keys and multi-field foreign keys is limited and untested.
+The system is able to support foreign keys and tables both with and without primary keys.  HOWEVER, support for multi-field primary keys and multi-field foreign keys is limited and untested. There are also some upper limits on how much data can be stored in tables that do not have primary keys. It is STRONGLY recommended to have primary keys in wherever possible.
 
 ## Important Note
 
