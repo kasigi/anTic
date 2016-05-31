@@ -11,6 +11,8 @@ angular.module('anTicketer')
         $scope.recordEditPending = [];
         $scope.recordDeletePending = [];
         $scope.fieldTypeMapping = {};
+        $scope.displayMode = "table";
+        $scope.singleRecordTarget = {};
         // Initial Run
 
         // Get data model
@@ -54,7 +56,20 @@ angular.module('anTicketer')
         });
 
 
+        var orderBy = $filter('orderBy');
+        $scope.predicate = '';
+        $scope.reverse = true;
+
 // End Initialization
+
+        $scope.order = function (predicate) {
+            $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+            $scope.currentTable.data = orderBy($scope.currentTable.data, predicate, $scope.reverse);
+            $scope.predicate = predicate;
+            console.log(predicate);
+            $scope.rekeyPKData();
+            console.log($scope.currentTable);
+        };
 
 
         $scope.initialSelectTable = function () {
@@ -63,6 +78,20 @@ angular.module('anTicketer')
                 $scope.selectTable();
             }
         }// end initialSelectTable
+
+
+
+        $scope.editAllRecord = function(){
+            $scope.displayMode = "table";
+            $scope.selectTable();
+        }// end editAllRecord
+
+
+        $scope.editSingleRecord = function(dataRowID){
+            $scope.displayMode = "singleRecord";
+            $scope.getRecord(dataRowID);
+            // Build Primary Key Array to Get ONE record
+        }// end editSingleRecord
 
 
         $scope.getForeignKeyDisplayFieldsForRecordField = function (fieldName, fieldValue) {
@@ -96,17 +125,19 @@ angular.module('anTicketer')
 
         // Function Select Table Data
         $scope.selectTable = function () {
-            $scope.currentTable.dataModel = $scope.dataModel[$scope.currentTableSelected];
             //route.updateParams("table",$scope.currentTableSelected);
-            $location.search('currentTableSelected', $scope.currentTableSelected);
-            $scope.getAllForTableData($scope.currentTableSelected);
+            $scope.currentTable.dataModel = $scope.dataModel[this.currentTableSelected];
+            $location.search('currentTableSelected', this.currentTableSelected);
+            $scope.currentTableSelected = this.currentTableSelected;
+            $scope.getAllForTableData(this.currentTableSelected);
+
         }// end selectTable
 
         $scope.fieldType = function (fieldName, tableName) {
+
             if ('foreignKeyTable' in $scope.dataModel[tableName]['fields'][fieldName]) {
                 return "foreignKey";
             } else {
-
 
                 // Look for model defined custom field display types
                 if(typeof $scope.dataModel[tableName]['fields'][fieldName]['fieldEditDisplayType'] !== 'undefined'){
@@ -140,6 +171,7 @@ angular.module('anTicketer')
             var responsePromise = $http.post("interface/data.php", tableData);
 
             responsePromise.success(function (data, status, headers, config) {
+
                 console.log(data);
                 if (typeof data['data'] != "undefined") {
                     // Table has data
@@ -163,7 +195,6 @@ angular.module('anTicketer')
                 } else {
                     $scope.currentTable.fkdata = {};
                 }
-
 
                 console.log($scope.currentTable);
 
@@ -196,7 +227,18 @@ angular.module('anTicketer')
             }
             var responsePromise = $http.post("interface/data.php", tableData);
             responsePromise.success(function (data, status, headers, config) {
-                $scope.currentTable.data[dataRowID] = data['data'][0];
+                if($scope.displayMode == "singleRecord"){
+                    // Empty the data table if only editing a single record
+                    $scope.currentTable.data = [];
+                    $scope.currentTable.data.push(data['data'][0]);
+
+                    // Rebuild the pkData if switching to single record / in single record dislay mode
+                    $scope.rekeyPKData();
+                }else{
+                    $scope.currentTable.data[dataRowID] = data['data'][0];
+                }
+
+
             });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
@@ -386,20 +428,6 @@ angular.module('anTicketer')
 
         }// end deleteRecord
 
-
-        var orderBy = $filter('orderBy');
-        $scope.predicate = '';
-        $scope.reverse = true;
-        $scope.order = function (predicate) {
-            $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
-            $scope.currentTable.data = orderBy($scope.currentTable.data, predicate, $scope.reverse);
-            $scope.predicate = predicate;
-            console.log(predicate);
-            $scope.rekeyPKData();
-            console.log($scope.currentTable);
-        };
-
-
         $scope.rekeyPKData = function () {
             //This function updates the pkdata array after a sort / filter operation
             var newPKData = [];
@@ -414,6 +442,7 @@ angular.module('anTicketer')
             $scope.currentTable.pkdata = newPKData;
 
         }//rekeyPKData
+        
 
 
     })
@@ -423,5 +452,45 @@ angular.module('anTicketer')
             replace: 'true',
             scope: false,
             templateUrl: 'partials/directive-templates/tablefield.html'
+        }
+    })
+    .directive("datatable",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/dataTable.html'
+        }
+    })
+    .directive("singlerecordcontrols",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/singleRecordControls.html'
+        }
+    })
+    .directive("tablerecordcontrols",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/tableRecordControls.html'
+        }
+    })
+    .directive("singlerecordedit",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/singleRecordEdit.html'
+        }
+    })
+    .directive("tableselect",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/tableSelect.html'
         }
     });

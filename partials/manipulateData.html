@@ -1,0 +1,75 @@
+<div ng-if="displayMode == 'table'">
+
+    <div class="row">
+        <div class="col-md-6">
+            <tableselect></tableselect>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-primary btn-lg pull-right" type="button" ng-click="addRecord()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Entry</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <datatable></datatable>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="ant-single-record-panel" ng-if="displayMode == 'singleRecord'">
+
+    <div class="row">
+        <div class="col-md-6">
+
+        </div>
+        <div class="col-md-6">
+
+            <singlerecordcontrols></singlerecordcontrols>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+
+
+            <div class="panel panel-default">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a data-target="#editRecord" aria-controls="editRecord" role="tab" data-toggle="tab">Edit Record</a></li>
+                    <li role="presentation"><a data-target="#editRecordLogs" aria-controls="editRecordLogs" role="tab" data-toggle="tab">View Log / Versions</a></li>
+
+                </ul>
+                <div class="panel-body">
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="editRecord">
+                            <singlerecordedit></singlerecordedit>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="editRecordLogs">
+                            Log Here
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+
+
+</div>

@@ -4,7 +4,7 @@ config(function($routeProvider){
     $routeProvider
     // route for the contact page
         .when('/table/', {
-            templateUrl : 'partials/table.html',
+            templateUrl : 'partials/manipulateData.html',
             controller  : 'TableController',
             reloadOnSearch : false
         })

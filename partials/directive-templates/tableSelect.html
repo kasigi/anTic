@@ -1,0 +1,6 @@
+<form action="" name="selectTableToEdit" ng-submit="selectTable()">
+    <label for="tableSelection">Select a Table</label>
+    <select class="form-control" name="tableSelection" id="tableSelection" ng-model="currentTableSelected" ng-change="selectTable()">
+        <option ng-repeat="dataTable in tableList" value="{{dataTable.tableName}}" ng-bind="dataTable.displayName"></option>
+    </select>
+</form>

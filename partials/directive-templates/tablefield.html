@@ -1,8 +1,9 @@
 <div class="anT-tableField">
 
+
     <div ng-if="'foreignKey'==fieldType(tableField,currentTableSelected)">
-        <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]"></span>
-        <select class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" aria-label="{{tableField}}">
+        <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
+        <select class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" aria-label="{{tableField}}">
             <option ng-repeat="fkRow in currentTable.fkdata[currentTable.dataModel.fields[tableField].foreignKeyTable]" value="{{fkRow[currentTable.dataModel.fields[tableField].foreignKeyColumns[0]]}}">
                 {{getForeignKeyDisplayFieldsForRecordField(tableField,fkRow[currentTable.dataModel.fields[tableField].foreignKeyColumns[0]])}}
             </option>
@@ -11,7 +12,7 @@
 
     <div ng-if="'boolean'==fieldType(tableField,currentTableSelected)">
         <span class="ant-entry-fieldDisplay" ng-bind="dataRow[tableField]"></span>
-        <select class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" aria-label="{{tableField}}">
+        <select class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" aria-label="{{tableField}}">
             <option value="0">False</option>
             <option value="1">True</option>
         </select>
@@ -19,43 +20,39 @@
 
     <div ng-if="'int'==fieldType(tableField,currentTableSelected)">
         <!-- INT Numbers -->
-        <span class="ant-entry-fieldDisplay"
-              ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
-        <input class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" type="text"  ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" aria-label="{{tableField}}">
+        <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
+        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text"  ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" aria-label="{{tableField}}">
     </div>
 
 
 
     <div ng-if="'float'==fieldType(tableField,currentTableSelected)">
         <!-- FLOAT Numbers -->
-        <span class="ant-entry-fieldDisplay"
-              ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
-        <input class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" type="text" aria-label="{{tableField}}">
+        <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
+        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text" aria-label="{{tableField}}">
     </div>
 
 
 
     <div ng-if="'date'==fieldType(tableField,currentTableSelected)">
         <!-- Date fields EXCLUDING year -->
-        <span class="ant-entry-fieldDisplay"
-              ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
-        <input class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" type="text"  aria-label="{{tableField}}">
+        <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
+        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text"  aria-label="{{tableField}}">
     </div>
 
 
     <div ng-if="'longtext'==fieldType(tableField,currentTableSelected)">
         <!-- Longtext -->
-        <span class="ant-entry-fieldDisplay"
-              ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
-        <input class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" type="text"  ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" aria-label="{{tableField}}">
+        <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
+        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text"  ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" aria-label="{{tableField}}">
     </div>
 
 
     <div ng-if="'text'==fieldType(tableField,currentTableSelected)">
         <!-- Text / Default -->
         <span class="ant-entry-fieldDisplay" ng-bind="getForeignKeyDisplayFieldsForRecordField(tableField,dataRow[tableField])"></span>
-        <input class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" type="text"  ng-if="currentTable.dataModel['fields'][tableField]['length']>0" ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" ng-maxlength="currentTable.dataModel.fields[tableField].length" aria-label="{{tableField}}">
-        <input class="form-control" name="dataRow[tableField]+dataRow" ng-model="dataRow[tableField]" type="text"  ng-if="currentTable.dataModel['fields'][tableField]['length']<=0" ng-maxlength="currentTable.dataModel.fields[tableField].length" aria-label="{{tableField}}">
+        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text"  ng-if="currentTable.dataModel['fields'][tableField]['length']>0" ng-maxlength="currentTable.dataModel['fields'][tableField]['length']" ng-maxlength="currentTable.dataModel.fields[tableField].length" aria-label="{{tableField}}">
+        <input class="form-control" name="{{tableField+dataRowIndex}}" ng-model="dataRow[tableField]" type="text"  ng-if="currentTable.dataModel['fields'][tableField]['length']<=0" ng-maxlength="currentTable.dataModel.fields[tableField].length" aria-label="{{tableField}}">
 
     </div>
 

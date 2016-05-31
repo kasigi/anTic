@@ -1,0 +1,41 @@
+<div class="panel panel-default ant-entryTable-outer">
+
+    <table class="table table-striped ant-entryTable table-hover">
+        <caption ng-if="currentTable.dataModel.description != ''" ng-bind="currentTable.dataModel.description"></caption>
+            <thead>
+            <tr>
+                <th ng-attr-id="thID-{{ tableField }}" ng-repeat="tableField in currentTable.dataModel.fieldOrder" ng-if="currentTable.dataModel.listViewDisplayFields === undefined  || currentTable.dataModel.listViewDisplayFields.indexOf(tableField)>-1">
+
+                    <span ng-bind="currentTable.dataModel.fields[tableField].displayName" ng-click="order(tableField)" class="ant-entryTableColHeader">></span>
+                    <span ng-show="predicate===tableField" class="text-info glyphicon" ng-class="{true:'glyphicon-triangle-bottom',false:'glyphicon-triangle-top'}[reverse]"></span>
+                    <span ng-show="currentTable.dataModel.fields[tableField].helpText" data-toggle="tooltip" data-placement="bottom" title="{{currentTable.dataModel.fields[tableField].helpText}}" class="text-primary glyphicon glyphicon-question-sign" aria-hidden="true" ></span>
+
+                </th>
+                <th id="thID-controls">
+                    <div class="btn-group" role="group" aria-label="Table-level Controls">
+                        <a class="btn btn-standard btn-xs" href="interface/csv.php?tableName={{ currentTableSelected }}"><span class="glyphicon glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download CSV</a>
+                    </div>
+
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="dataRow in currentTable.data" ng-init="dataRowIndex = $index" ng-model-options="{ debounce: 350 }" ng-click="setRecordEditPending($index)" ng-class="recordEditPending.indexOf($index)>-1 ? 'ant-entry-editPending' : ''
+">
+                <td ng-attr-headers="thID-{{ tableField }}" ng-repeat="tableField in currentTable.dataModel.fieldOrder" ng-if="currentTable.dataModel.listViewDisplayFields === undefined  || currentTable.dataModel.listViewDisplayFields.indexOf(tableField)>-1">
+                    <tablefield></tablefield>
+                </td>
+                <td headers="thID-controls">
+                    <!---->
+                    <tablerecordcontrols></tablerecordcontrols>
+
+                </td>
+            </tr>
+
+
+            </tbody>
+    </table>
+
+
+    <?php //include('reference/entryTable.html'); ?>
+</div>
