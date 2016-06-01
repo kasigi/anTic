@@ -10,6 +10,8 @@ $angularVersion = "1.4.9";
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/<?php echo $angularVersion; ?>/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/<?php echo $angularVersion; ?>/angular-route.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/<?php echo $angularVersion; ?>/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/<?php echo $angularVersion; ?>/angular-animate.min.js"></script>
+<script src="js/library/ui-bootstrap-tpls-1.3.3.min.js"></script>
 
 
 <script src="js/anTicketer.js"></script>

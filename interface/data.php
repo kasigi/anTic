@@ -267,12 +267,15 @@ $output['pk']=$primaryRecordKeys;
         //$output['sql']=$sql;
     }
 
-    $statement = $db->prepare($countSql);
-    $success = $statement->execute();
-    while ($data = $statement->fetch(PDO::FETCH_ASSOC))  {
-        $output['recordTotalCount']=$data['recordTotalCount'];
-        //$output['sql']=$sql;
+    if($countSql!=""){
+        $statement = $db->prepare($countSql);
+        $success = $statement->execute();
+        while ($data = $statement->fetch(PDO::FETCH_ASSOC))  {
+            $output['recordTotalCount']=$data['recordTotalCount'];
+            //$output['sql']=$sql;
+        }
     }
+
 
 
 

@@ -332,6 +332,7 @@ angular.module('anTicketer')
             }
             var responsePromise = $http.post("interface/data.php", tableData);
             responsePromise.success(function (data, status, headers, config) {
+
                 if($scope.displayMode == "singleRecord"){
                     // Empty the data table if only editing a single record
                     $scope.currentTable.data = [];
