@@ -1,5 +1,5 @@
 <?php
-include('includes/header.php');
+include('includes/interface/header.php');
 ?>
     <div class="container" ng-app="anTicketer" >
 
@@ -8,4 +8,4 @@ include('includes/header.php');
     </div><!-- end container -->
 
 <?php
-include('includes/footer.php');
+include('includes/interface/footer.php');

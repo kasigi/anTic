@@ -77,7 +77,7 @@ if(!in_array($aRequest['action'],$validRequests)){
 // Check for valid table name
 global $dataModels,$db;
 
-$settingsSet = include('../includes/loadDataConnections.php');
+$settingsSet = include('../includes/engine/loadDataConnections.php');
 
 buildDataModels('data');
 
