@@ -1,4 +1,4 @@
-CREATE TABLE `anticUser` (
+CREATE TABLE IF NOT EXISTS `anticUser` (
   `userID` int(10) NOT NULL AUTO_INCREMENT,
   `email` varchar(512) DEFAULT NULL,
   `password` varchar(512) DEFAULT '',
@@ -10,7 +10,7 @@ CREATE TABLE `anticUser` (
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `anticVersionLog` (
+CREATE TABLE IF NOT EXISTS `anticVersionLog` (
   `id` bigint(20) NOT NULL,
   `tableName` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `pkArrayBaseJson` varchar(2048) CHARACTER SET latin1 DEFAULT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `anticVersionLog` (
 
 
 
-CREATE TABLE `anticSystemLogEventType` (
+CREATE TABLE IF NOT EXISTS `anticSystemLogEventType` (
   `eventTypeID` int(11) NOT NULL AUTO_INCREMENT,
   `eventDescription` varchar(255) NOT NULL,
   PRIMARY KEY (`eventTypeID`)
@@ -35,7 +35,7 @@ CREATE TABLE `anticSystemLogEventType` (
 
 
 
-CREATE TABLE `anticSystemLog` (
+CREATE TABLE IF NOT EXISTS `anticSystemLog` (
   `eventID` bigint(20) NOT NULL AUTO_INCREMENT,
   `timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `eventTypeID` int(11) DEFAULT NULL,
@@ -51,14 +51,14 @@ CREATE TABLE `anticSystemLog` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `anticGroup` (
+CREATE TABLE IF NOT EXISTS `anticGroup` (
   `groupID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `groupName` varchar(80) NOT NULL,
   PRIMARY KEY (`groupID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `anticUserGroup` (
+CREATE TABLE IF NOT EXISTS `anticUserGroup` (
   `userID` int(10) NOT NULL DEFAULT '0',
   `groupID` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`userID`,`groupID`),
@@ -68,16 +68,17 @@ CREATE TABLE `anticUserGroup` (
 REPLACE INTO `anTicketer`.`anticUser` (`userID`, `email`, `firstName`, `lastName`) VALUES ('0', 'null@null', 'antic', 'antic');
 
 
-CREATE TABLE `anticSystemSettingType` (
+CREATE TABLE IF NOT EXISTS `anticSystemSettingType` (
   `systemSettingTypeID` INT NOT NULL,
   `systemSettingName` VARCHAR(65) NULL,
   `systemSettingDescription` VARCHAR(1024) NULL,
   PRIMARY KEY (`systemSettingTypeID`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+REPLACE INTO anticSystemSettingType VALUES (1,"anTicVersion","Build number of the current Antic Database");
 
 
-CREATE TABLE `anticSystemSetting` (
+CREATE TABLE IF NOT EXISTS `anticSystemSetting` (
   `systemSettingID` INT NOT NULL AUTO_INCREMENT,
   `systemSettingTypeID` INT NULL,
   `systemSettingValue` VARCHAR(1024) NULL,
@@ -90,17 +91,19 @@ CREATE TABLE `anticSystemSetting` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+REPLACE INTO anticSystemSetting VALUES (1,1,"1");
 
 
-CREATE TABLE `anticPermission` (
+CREATE TABLE IF NOT EXISTS `anticPermission` (
   `id` int(11) NOT NULL,
   `userID` int(11) DEFAULT NULL,
   `groupID` int(11) DEFAULT NULL,
   `tableName` varchar(45) DEFAULT NULL,
   `pkArrayBaseJson` varchar(2048) DEFAULT NULL,
-  `read` tinyint(1) DEFAULT NULL,
-  `write` tinyint(1) DEFAULT NULL,
-  `execute` tinyint(1) DEFAULT NULL,
+  `read` tinyint(1) DEFAULT 1,
+  `write` tinyint(1) DEFAULT 1,
+  `execute` tinyint(1) DEFAULT 1,
+  `administer` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `ixTablePK` (`tableName`,`pkArrayBaseJson`(255)),
   KEY `ixUserID` (`userID`,`read`,`write`),

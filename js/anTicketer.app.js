@@ -8,6 +8,11 @@ config(function($routeProvider){
             controller  : 'TableController',
             reloadOnSearch : false
         })
+        .when('/system/', {
+            templateUrl : 'partials/system.html',
+            controller  : 'TableController',
+            reloadOnSearch : false
+        })
         .otherwise( { redirectTo: "/table" });
 
 });

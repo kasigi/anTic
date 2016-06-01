@@ -215,6 +215,8 @@ angular.module('anTicketer')
             $scope.currentTable.dataModel = $scope.dataModel[this.currentTableSelected];
             $location.search('currentTableSelected', this.currentTableSelected);
             $scope.currentTableSelected = this.currentTableSelected;
+            $scope.recordEditPending = [];
+            $scope.recordDeletePending = [];
             $scope.getAllForTableData(this.currentTableSelected,callback);
         }// end selectTable
 
@@ -428,6 +430,13 @@ angular.module('anTicketer')
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
+        }
+
+
+        $scope.saveAllPendingEdits = function(){
+            for(var s = 0;s < $scope.recordEditPending.length;s++){
+                $scope.saveRecord($scope.recordEditPending[s]);
+            }
         }
 
 
