@@ -1,27 +1,27 @@
 <?php
 
-// Check for valid table name
-global $dataModels,$db;
 
-$settingsSet = include('../includes/engine/loadDataConnections.php');
+require(dirname(__FILE__).'/../includes/engine/dataController.php');
+$anTicData = new anTicData;
 
-buildDataModels('data');
+$anTicData->initDB();
+$models = $anTicData->buildDataModels('data');
 
 if($_REQUEST['tableName']!=""){
+// Check for valid table name
 
     $targetTable = preg_replace("/[^a-zA-Z0-9\-_\.]/", "", $_REQUEST['tableName']);
 
-    if(!in_array($targetTable,$dataModels['data'])){
+    if(!array_key_exists($targetTable,$models)){
         echo "Invalid Selection";
         exit;
     }
-
     $fileName = $targetTable.".csv";
 
     $sql = "SELECT * FROM $targetTable";
 
 
-    $statement = $db->prepare($sql);
+    $statement = $anTicData->db->prepare($sql);
     $statement->execute();
 
     // Process Results
