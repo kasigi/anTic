@@ -20,9 +20,8 @@ if($aRequest['action']=="buildModels") {
     die;
 }// end buildModels
 
-
+// Regular Actions
 $requestedActionInputs = $anTicData->gatherInputs();
-
 
 
 if($requestedActionInputs['action']=="get"){
@@ -43,6 +42,7 @@ if($requestedActionInputs['action']=="getversion"){
     echo json_encode($response);
     
 }// end get
+
 
 if($requestedActionInputs['action']=="getversionlog"){
     // Get the data
