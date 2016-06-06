@@ -6,6 +6,7 @@ angular.module('anTicketer')
         $scope.currentTable = {};
         $scope.currentTable.dataModel = {};
         $scope.currentTable.data = [];
+        $scope.currentTable.versionLogData = {};
         $scope.currentTable.recordTotalCount = 0;
         $scope.currentTable.fkdata = {};
         $scope.currentTable.pkdata = {};
@@ -38,7 +39,12 @@ angular.module('anTicketer')
 
 
         // Get data model
-        var responsePromise = $http.get("interface/dataStructure.php");
+
+        var modelRequest = {};
+        modelRequest.action = "buildModels";
+
+        var responsePromise = $http.post("interface/data.php", modelRequest);
+
         $scope.firstRun = true;
         responsePromise.success(function (data, status, headers, config) {
 
@@ -121,6 +127,7 @@ angular.module('anTicketer')
             $scope.displayMode = "singleRecord";
             $location.search('specificRecord',dataRowID);
             $scope.getRecord(dataRowID);
+            $scope.getVersionRecord(dataRowID);
             // Build Primary Key Array to Get ONE record
         }// end editSingleRecord
 
@@ -355,6 +362,33 @@ angular.module('anTicketer')
         }// end getRecord
 
 
+
+        $scope.getVersionRecord = function (dataRowID) {
+            var tableData = {};
+            tableData.tableName = $scope.currentTableSelected;
+            tableData.action = "getVersionLog";
+            tableData.pkey = {};
+
+            var keyName = "";
+            for (var keyID in $scope.currentTable.dataModel.primaryKey) {
+                keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+                tableData.pkey[keyName] = $scope.currentTable.pkdata[dataRowID][keyName];
+            }
+            var responsePromise = $http.post("interface/data.php", tableData);
+            responsePromise.success(function (data, status, headers, config) {
+                  //versionLogData
+                $scope.currentTable.versionLogData[dataRowID] = data['data'];
+                console.log($scope.currentTable.versionLogData);
+
+            });
+            responsePromise.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+
+        }// end getRecord
+
+
+
         $scope.saveRecord = function (dataRowID) {
             console.log($scope.currentTable.data[dataRowID]);
 
@@ -387,7 +421,8 @@ angular.module('anTicketer')
                 tableData.data[fieldName] = $scope.currentTable.data[dataRowID][fieldName];
             }
 
-
+console.log("add/update");
+            console.log(tableData);
             var responsePromise = $http.post("interface/data.php", tableData);
 
             responsePromise.success(function (data, status, headers, config) {

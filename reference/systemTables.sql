@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `anticUser` (
 
 
 CREATE TABLE IF NOT EXISTS `anticVersionLog` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `tableName` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `pkArrayBaseJson` varchar(2048) CHARACTER SET latin1 DEFAULT NULL,
   `timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `anticVersionLog` (
   KEY `ixUserID` (`userID`),
   CONSTRAINT `userID` FOREIGN KEY (`userID`) REFERENCES `anticUser` (`userID`) ON DELETE NO ACTION ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 
 
