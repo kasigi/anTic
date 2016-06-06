@@ -362,11 +362,10 @@ angular.module('anTicketer')
         }// end getRecord
 
 
-
         $scope.getVersionRecord = function (dataRowID) {
             var tableData = {};
             tableData.tableName = $scope.currentTableSelected;
-            tableData.action = "getVersionLog";
+            tableData.action = "getversionlog";
             tableData.pkey = {};
 
             var keyName = "";
@@ -377,16 +376,62 @@ angular.module('anTicketer')
             var responsePromise = $http.post("interface/data.php", tableData);
             responsePromise.success(function (data, status, headers, config) {
                   //versionLogData
-                $scope.currentTable.versionLogData[dataRowID] = data['data'];
-                console.log($scope.currentTable.versionLogData);
+                console.log($scope.currentTable);
+                if($scope.displayMode == "singleRecord"){
+                    // Empty the data table if only editing a single record
+                    $scope.currentTable.versionLogData = {};
+                    $scope.currentTable.versionLogData = {0:data['data']};
+
+                }else{
+                    $scope.currentTable.versionLogData[dataRowID] = data['data'];
+                }
+                console.log("VersionData");
+                console.log(data['data']);
+                console.log($scope.currentTable);
 
             });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
-
         }// end getRecord
 
+
+        $scope.getVersion = function (dataRowID,versionID){
+
+            var tableData = {};
+            tableData.tableName = $scope.currentTableSelected;
+            tableData.action = "getversion";
+            tableData.pkey = {};
+            tableData.versionID = versionID;
+
+            var keyName = "";
+            for (var keyID in $scope.currentTable.dataModel.primaryKey) {
+                keyName = $scope.currentTable.dataModel.primaryKey[keyID];
+                tableData.pkey[keyName] = $scope.currentTable.pkdata[dataRowID][keyName];
+            }
+            var responsePromise = $http.post("interface/data.php", tableData);
+            responsePromise.success(function (data, status, headers, config) {
+                //versionLogData
+
+                    // Empty the data table if only editing a single record
+                var intermediate = JSON.parse(data['data'],true);
+
+                if($scope.displayMode == "singleRecord"){
+                    // Empty the data table if only editing a single record
+                    $scope.currentTable.data = [];
+                    $scope.currentTable.data.push(intermediate[0]);
+
+                    // Rebuild the pkData if switching to single record / in single record dislay mode
+                    $scope.rekeyPKData();
+                }else{
+                    $scope.currentTable.data[dataRowID] = JSON.parse(intermediate[0]);
+                }
+
+            });
+            responsePromise.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+        }// end getVersion
 
 
         $scope.saveRecord = function (dataRowID) {
@@ -421,8 +466,6 @@ angular.module('anTicketer')
                 tableData.data[fieldName] = $scope.currentTable.data[dataRowID][fieldName];
             }
 
-console.log("add/update");
-            console.log(tableData);
             var responsePromise = $http.post("interface/data.php", tableData);
 
             responsePromise.success(function (data, status, headers, config) {
@@ -461,7 +504,14 @@ console.log("add/update");
                 }
 
 
-            });
+                // Update version log display
+
+                if($scope.displayMode == "singleRecord") {
+                    $scope.getVersionRecord(dataRowID);
+                }
+
+
+                });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });

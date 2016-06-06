@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 
 require(dirname(__FILE__).'/../includes/engine/dataController.php');
@@ -28,6 +28,16 @@ $requestedActionInputs = $anTicData->gatherInputs();
 if($requestedActionInputs['action']=="get"){
     // Get the data
     $response = $anTicData->dataGet($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys']);
+
+    // Return JSON
+    echo json_encode($response);
+
+}// end get
+
+
+if($requestedActionInputs['action']=="getversion"){
+    // Get the data
+    $response = $anTicData->dataVersionGet($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys'],$requestedActionInputs['versionID']);
 
     // Return JSON
     echo json_encode($response);

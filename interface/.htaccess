@@ -1,1 +1,1 @@
- #php_value error_reporting 128
+ php_value error_reporting 128

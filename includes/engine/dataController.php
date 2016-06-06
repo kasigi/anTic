@@ -5,7 +5,7 @@ class anTicData
 
     public $db;
     public $dataModels;
-    public $validRequests = array("get", "getversionlog","getall", "set", "delete", "add","buildModels");
+    public $validRequests = array("get","getversion", "getversionlog","getall", "set", "delete", "add","buildModels");
     public $validDataModelTypes = array("data", "system");
 
 
@@ -315,11 +315,15 @@ AND i.TABLE_SCHEMA = DATABASE();";
             $inputData = [];
         }
 
+        if (isset($aRequest['versionID'])){
+            $versionID = intval($aRequest['versionID']);
+        }
 
         $returnArr = [];
         $returnArr['inputData'] = $inputData;
         $returnArr['targetTable'] = $targetTable;
         $returnArr['action'] = $aRequest['action'];
+        $returnArr['versionID']=$versionID;
         $returnArr['primaryRecordKeys'] = $primaryRecordKeys;
         return $returnArr;
 
@@ -541,7 +545,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
             $output['error']="A target table and primary key set MUST be specified";
         }
 
-        $sql = "SELECT id, timestamp, userID FROM anTicketer.anticVersionLog WHERE tableName = :tableName AND pkArrayBaseJson = :pkArrayBaseJson ORDER BY timestamp DESC;";
+        $sql = "SELECT id, timestamp, userID FROM anticVersionLog WHERE tableName = :tableName AND pkArrayBaseJson = :pkArrayBaseJson ORDER BY timestamp DESC;";
 
         $statement = $this->db->prepare($sql);
         $statement->bindValue(":tableName", $targetTable);
@@ -561,7 +565,6 @@ AND i.TABLE_SCHEMA = DATABASE();";
         while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
             $output['status'] = "success";
             $output['data'][] = $data;
-            //$output['sql']=$sql;
         }
 
         return $output;
@@ -571,6 +574,35 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
     function dataVersionGet($targetTable, $primaryRecordKeys,$versionID){
 
+        if(!isset($targetTable) || !isset($primaryRecordKeys) || !is_int($versionID)){
+            $output['status']="error";
+            $output['error']="A target table and primary key set MUST be specified";
+        }
+
+        $sql = "SELECT data FROM anticVersionLog WHERE tableName = :tableName AND pkArrayBaseJson = :pkArrayBaseJson AND id = :id LIMIT 1;";
+
+        $statement = $this->db->prepare($sql);
+        $statement->bindValue(":tableName", $targetTable);
+        $statement->bindValue(":pkArrayBaseJson", json_encode($primaryRecordKeys));
+        $statement->bindValue(":id", $versionID);
+
+        $success = $statement->execute();
+        if(!$success){
+            $output['status']="error";
+            $output['error']=$statement->errorCode();
+            $output['sqlError']=$statement->errorInfo();
+            //$output['sqlError']['sql']=$sql;
+            return $output;
+        }
+
+        // Process Results
+        $output = null;
+        while ($data = $statement->fetchAll(PDO::FETCH_ASSOC)) {
+            $output['status'] = "success";
+            $output['data'] = $data[0]['data'];
+        }
+
+        return $output;
 
     }//dataVersionGet
 

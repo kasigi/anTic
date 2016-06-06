@@ -63,8 +63,31 @@
                         <div role="tabpanel" class="tab-pane active" id="editRecord">
                             <singlerecordedit></singlerecordedit>
                         </div>
+
+
                         <div role="tabpanel" class="tab-pane" id="editRecordLogs">
-                            Log Here
+                            <table ng-repeat="versionRecordObject in currentTable.versionLogData" ng-init="dataRowIndex = $index"  class="table table-striped ant-entryTable table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Version ID</th>
+                                        <th>Timestamp</th>
+                                        <th>User</th>
+                                        <th id="thID-controls">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="versionRecord in versionRecordObject">
+                                        <td ng-repeat="versionRecordField in versionRecord">{{versionRecordField}}</td>
+
+                                        <td headers="thID-controls">
+                                            <div class="btn-group" role="group" aria-label="Edit Record Controls">
+
+                                            <a role="button" aria-label="Revert" data-target="#" class="btn btn-danger btn-sm" ng-click="getVersion(dataRowIndex,versionRecord['id'])">Load Version</a>
+                                                </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
                         </div>
 
