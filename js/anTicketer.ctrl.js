@@ -694,7 +694,14 @@ angular.module('anTicketer')
             templateUrl: 'partials/directive-templates/tableListPagination.html'
         }
     })
-
+    .directive("recordlogs",function(){
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/recordlogs.html'
+        }
+    })
     .directive("tableselect",function(){
         return {
             restrict: 'E',
@@ -703,3 +710,8 @@ angular.module('anTicketer')
             templateUrl: 'partials/directive-templates/tableSelect.html'
         }
     });
+
+
+
+
+
