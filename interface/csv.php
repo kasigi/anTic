@@ -1,7 +1,7 @@
 <?php
 
 
-require(dirname(__FILE__).'/../includes/engine/dataController.php');
+require_once(dirname(__FILE__).'/../includes/engine/engine.php');
 $anTicData = new anTicData;
 
 $anTicData->initDB();

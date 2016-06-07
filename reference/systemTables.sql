@@ -14,9 +14,9 @@ CREATE TABLE `anticUser` (
 # Forces the creation of the service account user
 INSERT INTO anticUser
 (`userID`, `email`, `password`, `firstName`, `lastName`, `lastLogin`, `allowLogin`, `active`)
-  SELECT * FROM (SELECT  0 as userID, 'null@null' as email,'' as password,'Antic' as firstName,'Service Account' as lastName,NOW() as lastLogin,0 as allowLogin,1 as active) as anticTMPUser
+  SELECT * FROM (SELECT  0 as userID, 'null@null' as email,'$2y$12$lMHic5bdqQ6uacODV2idbeZ00BywOkETpc9k8WA/rn/wtrG2kmR7O' as password,'Antic' as firstName,'Service Account' as lastName,NOW() as lastLogin,0 as allowLogin,1 as active) as anticTMPUser
   WHERE NOT EXISTS (SELECT * FROM anticUser WHERE userID=0);
-UPDATE anticUser SET `userID` = 0, `email` = 'null@null', `password`='', `firstName`='Antic', `lastName`='Service Account', `lastLogin`=NOW(), `allowLogin`=0, `active`=1 WHERE userID=0;
+UPDATE anticUser SET `userID` = 0, `email` = 'null@null', `password`='$2y$12$lMHic5bdqQ6uacODV2idbeZ00BywOkETpc9k8WA/rn/wtrG2kmR7O', `firstName`='Antic', `lastName`='Service Account', `lastLogin`=NOW(), `allowLogin`=0, `active`=1 WHERE userID=0;
 
 SELECT * FROM anticUser;
 

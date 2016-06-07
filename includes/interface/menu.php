@@ -94,3 +94,9 @@
 
 
 </div>
+
+<div ng-controller="LoginController">
+    <p>Email</p>
+    {{userMeta}}
+    <p ng-bind="userMeta.email"></p>
+</div>

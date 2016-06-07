@@ -1,4 +1,4 @@
-angular.module('anTicketer', ['ngRoute', 'ngAria','ui.bootstrap']).
+angular.module('anTic', ['ngRoute', 'ngAria','ui.bootstrap']).
 config(function($routeProvider){
 
     $routeProvider
@@ -8,9 +8,14 @@ config(function($routeProvider){
             controller  : 'TableController',
             reloadOnSearch : false
         })
+        .when('/login/', {
+            templateUrl : 'partials/login.html',
+            controller  : 'LoginController',
+            reloadOnSearch : false
+        })
         .when('/system/', {
             templateUrl : 'partials/system.html',
-            controller  : 'TableController',
+            controller  : 'SystemController',
             reloadOnSearch : false
         })
         .otherwise( { redirectTo: "/table" });

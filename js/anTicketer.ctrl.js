@@ -1,5 +1,43 @@
-angular.module('anTicketer')
-    .controller("TableController", function ($scope, $route, $location, $routeParams, $http, $filter) {
+angular.module('anTic')
+    .factory('anTicUserMeta', function($http) {
+        var anTicUserMetaObj = {};
+        var anTicUserMeta = {};
+        var whoamiInFlight = false;
+        anTicUserMeta.loggedIn = false;
+        anTicUserMeta.email = "";
+
+        anTicUserMetaObj.setUserMeta = function(userMetaIn) {
+            anTicUserMeta = userMetaIn;
+        }
+        anTicUserMetaObj.setUserSingleMeta = function(keyName,userMetaIn) {
+            anTicUserMeta[keyName] = userMetaIn;
+        }
+
+        anTicUserMetaObj.getUserMeta = function() {
+            return anTicUserMeta;
+        }
+
+        anTicUserMetaObj.whoami = function (callback){
+            if(whoamiInFlight == false){
+                whoamiInFlight = true;
+                var crData = {};
+                crData.action = "whoami";
+
+                var responsePromise = $http.post("interface/user.php", crData);
+                responsePromise.success(function (data, status, headers, config) {
+                    anTicUserMetaObj.setUserMeta(data['data']);
+                    whoamiInFlight = false;
+                    callback(anTicUserMeta);
+                });
+                responsePromise.error(function (data, status, headers, config) {
+                    alert("AJAX failed!");
+                });
+            }
+        }// end whoami
+
+        return anTicUserMetaObj;
+    })
+    .controller("TableController", function ($scope, $route, $location, $routeParams, $http, $filter,anTicUserMeta) {
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
         $scope.dataModel = {};
         $scope.currentTableSelected = "";
@@ -646,6 +684,49 @@ angular.module('anTicketer')
         
 
     })
+    .controller("LoginController", function ($scope, $route, $location, $routeParams, $http, $filter,anTicUserMeta) {
+        $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+
+        $scope.userCredentials = {};
+        $scope.userCredentials.password = "";
+        $scope.userCredentials.email = "";
+        $scope.loggedIn = false;
+        if(typeof $scope.userMeta == "undefined"){
+            anTicUserMeta.whoami(function(userMeta){
+                $scope.userMeta = anTicUserMeta.getUserMeta();
+                $scope.userCredentials.email = $scope.userMeta.email;
+                console.log($scope.userMeta);
+            });
+        }
+
+
+        $scope.login = function(){
+            var crData = {};
+            crData.action = "login";
+            crData.email = $scope.userCredentials.email;
+            crData.password = $scope.userCredentials.password;
+
+            var responsePromise = $http.post("interface/user.php", crData);
+            responsePromise.success(function (data, status, headers, config) {
+                anTicUserMeta.setUserSingleMeta('email',$scope.userCredentials.email);
+                anTicUserMeta.setUserSingleMeta('loggedIn',true);
+                $scope.userMeta = anTicUserMeta.getUserMeta();
+            });
+            responsePromise.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+
+            $scope.userCredentials.password = "";
+        }// end login
+
+
+    })
+    .controller("SystemController", function ($scope, $route, $location, $routeParams, $http, $filter) {
+        $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+
+
+    })
+
     .directive("tablefield", function () {
         return {
             restrict: 'E',

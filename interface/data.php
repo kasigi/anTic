@@ -2,10 +2,17 @@
 error_reporting(E_ERROR | E_PARSE);
 
 
-require(dirname(__FILE__).'/../includes/engine/dataController.php');
+require_once(dirname(__FILE__).'/../includes/engine/engine.php');
 
 $anTicData = new anTicData;
+$anTicUser = new anTicUser;
 
+if(!$anTicUser->checkLogin()){
+    $badStatus['status']="error";
+    $badStatus['Message']="Not Logged In";
+    echo json_encode($badStatus);
+    die;
+}
 
 $anTicData->initDB();
 $models = $anTicData->buildDataModels('data');

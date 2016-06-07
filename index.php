@@ -1,7 +1,7 @@
 <?php
 include('includes/interface/header.php');
 ?>
-    <div class="container" ng-app="anTicketer" >
+    <div class="container"  >
 
         <ng-view></ng-view>
 

@@ -15,7 +15,7 @@
     <title>Task Manager Application</title>
 
 </head>
-<body>
+<body ng-app="anTic">
 
 <?php
 

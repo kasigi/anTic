@@ -67,7 +67,7 @@ This is a sample of every possible field in the model. These are *ALL* optional.
 
 ## Known Limitations
 
-The system is able to support foreign keys and tables both with and without primary keys.  HOWEVER, support for multi-field primary keys and multi-field foreign keys is limited and untested. There are also some upper limits on how much data can be stored in tables that do not have primary keys. It is STRONGLY recommended to have primary keys in wherever possible.
+The system is able to support foreign keys and tables both with and without primary keys.  HOWEVER, support for multi-field primary keys and foreign keys is limited and untested. There are also some upper limits on how much data can be stored in tables that do not have primary keys (it is suggested that the total length of all fields for tables without primary keys not exceed 2048). It is STRONGLY recommended to have primary keys in wherever possible.
 
 ## Important Note
 
