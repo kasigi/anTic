@@ -6349,41 +6349,48 @@ button.close {
   overflow: hidden;
   width: 50%; }
 
+/*
 .tnj-headermenu .navbar-form {
   border: none;
   padding: 0 15px;
   margin-top: 30px;
-  box-shadow: none;
-  -webkit-box-shadow: none;
-  width: 350px; }
+  box-shadow:none;
+  -webkit-box-shadow:none;
+  width: 350px;
+}
 
 .tnj-headermenu-under .navbar-form {
   font-family: 'Source Sans Pro', sans-serif;
   border: none;
   padding: 0 15px;
   margin-top: 0;
-  box-shadow: none;
-  -webkit-box-shadow: none;
-  width: 450px; }
+  box-shadow:none;
+  -webkit-box-shadow:none;
+  width: 450px;
+}
 
 .tnj-headermenu .navbar-form .form-control, .tnj-headermenu-under .navbar-form .form-control {
-  background: #414148;
-  border-color: #8e8e98;
-  color: white; }
+  background: rgb(65,65,72);
+  border-color: rgb(142,142,152);
+  color: white;
+}
 
 .tnj-headermenu .navbar-form button, .tnj-headermenu-under .navbar-form button {
   color: white;
-  background: #671616;
-  border-color: #8e8e98;
+  background: rgb(103,22,22);
+  border-color: rgb(142,142,152);
   border-left: none;
   text-transform: uppercase;
   font-weight: 600;
   font-size: 12px;
-  line-height: 20px; }
+  line-height: 20px;
+}
 
 .tnj-headermenu .navbar-form button:hover, .tnj-headermenu-under .navbar-form button:hover {
-  background-color: #920606; }
+  background-color: rgb(146,6,6);
+}
 
+*/
 .tnj-headermenu-mobile {
   min-height: 90px;
   font-family: 'Source Sans Pro', sans-serif;
@@ -6486,10 +6493,12 @@ button.close {
   color: white;
   background: #8c0606; }
 
+/*
 .tnj-archive-categories > li.active > a, .tnj-archive-categories > li.active > a:visited {
-  background: #cdcdd7;
-  color: #2a2a2a; }
-
+  background: rgb(205,205,215);
+  color: rgb(42,42,42);
+}
+*/
 @media (min-width: 768px) {
   .tnj-archive-categories > li + li {
     margin-left: 10px; } }
@@ -6587,11 +6596,13 @@ button.close {
   background: #8c0606;
   border-radius: 3px; }
 
+/*
 .tnj-header-category-nav li a, .tnj-header-category-nav li a:visited {
-  background: #cdcdd7;
-  color: #2a2a2a;
-  border-radius: 3px; }
-
+  background:rgb(205,205,215);
+  color: rgb(42,42,42);
+  border-radius: 3px;
+}
+*/
 .tnj-headertitles h4 {
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 0.9em;

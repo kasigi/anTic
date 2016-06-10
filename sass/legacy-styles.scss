@@ -327,6 +327,7 @@
   width: 50%;
 }
 
+/*
 .tnj-headermenu .navbar-form {
   border: none;
   padding: 0 15px;
@@ -367,8 +368,7 @@
   background-color: rgb(146,6,6);
 }
 
-
-
+*/
 
 .tnj-headermenu-mobile {
   min-height: 90px;
@@ -503,11 +503,12 @@
 }
 
 
-
+/*
 .tnj-archive-categories > li.active > a, .tnj-archive-categories > li.active > a:visited {
   background: rgb(205,205,215);
   color: rgb(42,42,42);
 }
+*/
 
 @media (min-width: 768px) {
   .tnj-archive-categories > li + li {
@@ -634,11 +635,13 @@
   border-radius: 3px;
 }
 
+/*
 .tnj-header-category-nav li a, .tnj-header-category-nav li a:visited {
   background:rgb(205,205,215);
   color: rgb(42,42,42);
   border-radius: 3px;
 }
+*/
 
 .tnj-headertitles h4 {
   font-family: 'Source Sans Pro', sans-serif;
