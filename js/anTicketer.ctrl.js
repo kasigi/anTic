@@ -1,43 +1,6 @@
 angular.module('anTic')
-    .factory('anTicUserMeta', function($http) {
-        var anTicUserMetaObj = {};
-        var anTicUserMeta = {};
-        var whoamiInFlight = false;
-        anTicUserMeta.loggedIn = false;
-        anTicUserMeta.email = "";
 
-        anTicUserMetaObj.setUserMeta = function(userMetaIn) {
-            anTicUserMeta = userMetaIn;
-        }
-        anTicUserMetaObj.setUserSingleMeta = function(keyName,userMetaIn) {
-            anTicUserMeta[keyName] = userMetaIn;
-        }
-
-        anTicUserMetaObj.getUserMeta = function() {
-            return anTicUserMeta;
-        }
-
-        anTicUserMetaObj.whoami = function (callback){
-            if(whoamiInFlight == false){
-                whoamiInFlight = true;
-                var crData = {};
-                crData.action = "whoami";
-
-                var responsePromise = $http.post("interface/user.php", crData);
-                responsePromise.success(function (data, status, headers, config) {
-                    anTicUserMetaObj.setUserMeta(data['data']);
-                    whoamiInFlight = false;
-                    callback(anTicUserMeta);
-                });
-                responsePromise.error(function (data, status, headers, config) {
-                    alert("AJAX failed!");
-                });
-            }
-        }// end whoami
-
-        return anTicUserMetaObj;
-    })
-    .controller("TableController", function ($scope, $route, $location, $routeParams, $http, $filter,anTicUserMeta) {
+    .controller("TableController", function ($scope, $rootScope,$route, $location, $routeParams, $http, $filter) {
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
         $scope.dataModel = {};
         $scope.currentTableSelected = "";
@@ -53,78 +16,84 @@ angular.module('anTic')
         $scope.fieldTypeMapping = {};
         $scope.displayMode = "table";
         $scope.singleRecordTarget = {};
-        $scope.displayCountOptions = [5,10,50,100,250,1000,5000];
+        $scope.displayCountOptions = [5, 10, 50, 100, 250, 1000, 5000];
         $scope.paginationOptions = [];
-        // Initial Run
-        // Get initial number of records to display
-        if (typeof $routeParams.displayCount != "undefined") {
-            $routeParams.displayCount = parseInt($routeParams.displayCount);
-            if($scope.displayCountOptions.indexOf($routeParams.displayCount) > -1){
-                $scope.displayCount = $routeParams.displayCount;
-            }else{
+
+        $scope.initialRun = function(){
+
+            // Initial Run
+            // Get initial number of records to display
+            if (typeof $routeParams.displayCount != "undefined") {
+                $routeParams.displayCount = parseInt($routeParams.displayCount);
+                if ($scope.displayCountOptions.indexOf($routeParams.displayCount) > -1) {
+                    $scope.displayCount = $routeParams.displayCount;
+                } else {
+                    $scope.displayCount = 1000;
+                }
+            } else {
                 $scope.displayCount = 1000;
             }
-        } else {
-            $scope.displayCount = 1000;
-        }
 
-        // Get initial display records offset
-        if (typeof $routeParams.displayOffset != "undefined" && parseInt($routeParams.displayOffset) > -1) {
-            $scope.displayOffset = parseInt($routeParams.displayOffset);
-        } else {
-            $scope.displayOffset = 0;
-        }
-
-
-        // Get data model
-
-        var modelRequest = {};
-        modelRequest.action = "buildModels";
-
-        var responsePromise = $http.post("interface/data.php", modelRequest);
-
-        $scope.firstRun = true;
-        responsePromise.success(function (data, status, headers, config) {
-
-            console.log(data);
-            $scope.dataModel = data;
-            $scope.tableList = [];
-            $scope.tableIndex = [];
-            jQuery.each(data, function (index, value) {
-                $scope.tableList.push({"tableName": index, "displayName": value.displayName});
-                $scope.tableIndex.push(index);
-            });
-
-            // Get initial current table selection
-            if (typeof $routeParams.currentTableSelected != "undefined" && $scope.tableIndex.indexOf($routeParams.currentTableSelected) > -1) {
-                $scope.currentTableSelected = $routeParams.currentTableSelected;
+            // Get initial display records offset
+            if (typeof $routeParams.displayOffset != "undefined" && parseInt($routeParams.displayOffset) > -1) {
+                $scope.displayOffset = parseInt($routeParams.displayOffset);
             } else {
-                $scope.currentTableSelected = $scope.tableList[0]['tableName'];
+                $scope.displayOffset = 0;
             }
 
-            $scope.initialSelectTable();
 
-        });
-        responsePromise.error(function (data, status, headers, config) {
-            alert("AJAX failed!");
-        });
+            // Get data model
 
-        // Get meta data on possible field types
-        var responsePromise2 = $http.get("dataModelMeta/validDataTypesMap.json");
-        responsePromise2.success(function (data, status, headers, config) {
-            console.log(data);
-            $scope.fieldTypeMapping = data;
-            $scope.initialSelectTable();
+            var modelRequest = {};
+            modelRequest.action = "buildModels";
 
-        });
-        responsePromise2.error(function (data, status, headers, config) {
-            alert("AJAX failed!");
-        });
+            var responsePromise = $http.post("interface/data.php", modelRequest);
+
+            $scope.firstRun = true;
+            responsePromise.success(function (data, status, headers, config) {
+
+                console.log(data);
+                $scope.dataModel = data;
+                $scope.tableList = [];
+                $scope.tableIndex = [];
+                jQuery.each(data, function (index, value) {
+                    $scope.tableList.push({"tableName": index, "displayName": value.displayName});
+                    $scope.tableIndex.push(index);
+                });
+
+                // Get initial current table selection
+                if (typeof $routeParams.currentTableSelected != "undefined" && $scope.tableIndex.indexOf($routeParams.currentTableSelected) > -1) {
+                    $scope.currentTableSelected = $routeParams.currentTableSelected;
+                } else {
+                    $scope.currentTableSelected = $scope.tableList[0]['tableName'];
+                }
+
+                $scope.initialSelectTable();
+
+            });
+            responsePromise.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+
+            // Get meta data on possible field types
+            var responsePromise2 = $http.get("dataModelMeta/validDataTypesMap.json");
+            responsePromise2.success(function (data, status, headers, config) {
+                console.log(data);
+                $scope.fieldTypeMapping = data;
+                $scope.initialSelectTable();
+
+            });
+            responsePromise2.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
 
 
-        var orderBy = $filter('orderBy');
-        $scope.predicate = '';
-        $scope.reverse = true;
+            var orderBy = $filter('orderBy');
+            $scope.predicate = '';
+            $scope.reverse = true;
+        }// end initial run tasks
+
+
 
 // End Initialization
 
@@ -139,48 +108,48 @@ angular.module('anTic')
 
 
         $scope.initialSelectTable = function () {
-            if(Object.keys($scope.fieldTypeMapping).length > 0 && Object.keys($scope.dataModel).length > 0 && $scope.firstRun == true){
+            if (Object.keys($scope.fieldTypeMapping).length > 0 && Object.keys($scope.dataModel).length > 0 && $scope.firstRun == true) {
                 $scope.firstRun = false;
-                $scope.selectTable(function(){
+                $scope.selectTable(function () {
                     // If a specific record has been requested in the url, switch to the singleRecord editing mode
                     if (typeof $routeParams.specificRecord != "undefined") {
                         var candidateRecord = parseInt($routeParams.specificRecord);
-                        if(typeof $scope.currentTable.data[candidateRecord] != "undefined"){
+                        if (typeof $scope.currentTable.data[candidateRecord] != "undefined") {
                             $scope.editSingleRecord(candidateRecord);
                         }
                     }
-                    });
+                });
             }
         }// end initialSelectTable
 
 
-        $scope.editAllRecord = function(){
+        $scope.editAllRecord = function () {
             $scope.displayMode = "table";
-            $location.search('specificRecord',null);
+            $location.search('specificRecord', null);
             $scope.selectTable();
         }// end editAllRecord
 
 
-        $scope.editSingleRecord = function(dataRowID){
+        $scope.editSingleRecord = function (dataRowID) {
             $scope.displayMode = "singleRecord";
-            $location.search('specificRecord',dataRowID);
+            $location.search('specificRecord', dataRowID);
             $scope.getRecord(dataRowID);
             $scope.getVersionRecord(dataRowID);
             // Build Primary Key Array to Get ONE record
         }// end editSingleRecord
 
 
-        $scope.setDisplayCount = function(displayCount){
+        $scope.setDisplayCount = function (displayCount) {
             var dataLength = $scope.currentTable.data.length;
             $scope.displayCount = displayCount;
 
-            if(dataLength > displayCount){
+            if (dataLength > displayCount) {
                 // Data is LONGER than the desired display. The correct display can be achieved by trimming down the data array.
                 var amountToRemove = dataLength - displayCount;
                 $scope.checkDisplayOffsetAgainstRecordCount();
-                $scope.currentTable.data.splice(displayCount,amountToRemove);
-                $scope.currentTable.pkdata.splice(displayCount,amountToRemove);
-            }else{
+                $scope.currentTable.data.splice(displayCount, amountToRemove);
+                $scope.currentTable.pkdata.splice(displayCount, amountToRemove);
+            } else {
                 // Data is equal to or shorter than the desired display. Data must be reloaded from the server
                 $scope.getAllForTableData($scope.currentTableSelected);
             }
@@ -190,9 +159,9 @@ angular.module('anTic')
         }//end setDisplayCount
 
 
-        $scope.checkDisplayOffsetAgainstRecordCount = function(){
+        $scope.checkDisplayOffsetAgainstRecordCount = function () {
             // If there are fewer records to display than allowed by displayCount, show all and set offset back to 0
-            if($scope.displayCount > $scope.currentTable.recordTotalCount){
+            if ($scope.displayCount > $scope.currentTable.recordTotalCount) {
                 $scope.displayOffset = 0;
                 $location.search('displayOffset', 0);
             }
@@ -200,9 +169,9 @@ angular.module('anTic')
         }//checkDisplayOffsetAgainstRecordCount
 
 
-        $scope.setDisplayOffset = function(displayOffset){
+        $scope.setDisplayOffset = function (displayOffset) {
             displayOffset = parseInt(displayOffset);
-            if(displayOffset < 0){
+            if (displayOffset < 0) {
                 displayOffset = 0;
             }
             $scope.displayOffset = displayOffset;
@@ -213,13 +182,13 @@ angular.module('anTic')
         }//setDisplayOffset
 
 
-        $scope.calculatePagination = function(){
+        $scope.calculatePagination = function () {
             // Create an array that lists the various record offset numbers for a given table
             $scope.paginationOptions = [];
-            if($scope.displayCount>0){
+            if ($scope.displayCount > 0) {
                 var pages = Math.ceil(this.currentTable.recordTotalCount / this.displayCount);
-                for(var q=0; q<pages; q++){
-                    $scope.paginationOptions.push(q*$scope.displayCount);
+                for (var q = 0; q < pages; q++) {
+                    $scope.paginationOptions.push(q * $scope.displayCount);
                 }
             }
         }// end calculatePagination
@@ -262,7 +231,7 @@ angular.module('anTic')
             $scope.currentTableSelected = this.currentTableSelected;
             $scope.recordEditPending = [];
             $scope.recordDeletePending = [];
-            $scope.getAllForTableData(this.currentTableSelected,callback);
+            $scope.getAllForTableData(this.currentTableSelected, callback);
         }// end selectTable
 
 
@@ -273,10 +242,10 @@ angular.module('anTic')
             } else {
 
                 // Look for model defined custom field display types
-                if(typeof $scope.dataModel[tableName]['fields'][fieldName]['fieldEditDisplayType'] !== 'undefined'){
-                    for(var keyType in $scope.fieldTypeMapping.customValidDataTypes){
-                        if(keyType == fieldType){
-                            console.log("Identified key "+keyType);
+                if (typeof $scope.dataModel[tableName]['fields'][fieldName]['fieldEditDisplayType'] !== 'undefined') {
+                    for (var keyType in $scope.fieldTypeMapping.customValidDataTypes) {
+                        if (keyType == fieldType) {
+                            console.log("Identified key " + keyType);
                             return keyType;
                         }
                     }
@@ -285,9 +254,9 @@ angular.module('anTic')
                 var fieldType = $scope.dataModel[tableName]['fields'][fieldName]['type'];
 
                 // Use the MYSQL-defined field type
-                for(var keyType in $scope.fieldTypeMapping.mysqlDataTypeMap){
+                for (var keyType in $scope.fieldTypeMapping.mysqlDataTypeMap) {
 
-                    if(typeof $scope.fieldTypeMapping.mysqlDataTypeMap[keyType] != 'undefined' && $scope.fieldTypeMapping.mysqlDataTypeMap[keyType].indexOf(fieldType)>-1){
+                    if (typeof $scope.fieldTypeMapping.mysqlDataTypeMap[keyType] != 'undefined' && $scope.fieldTypeMapping.mysqlDataTypeMap[keyType].indexOf(fieldType) > -1) {
                         return keyType;
                     }
                 }
@@ -297,7 +266,7 @@ angular.module('anTic')
         }
 
         // Function Load Table Data
-        $scope.getAllForTableData = function (tableName,callback) {
+        $scope.getAllForTableData = function (tableName, callback) {
             var tableData = {};
             tableData.tableName = tableName;
             tableData.action = "getall";
@@ -314,9 +283,9 @@ angular.module('anTic')
                 if (typeof data['data'] != "undefined") {
                     // Table has data
                     $scope.currentTable.data = data['data'];
-                    if(typeof data['recordTotalCount'] != "undefined"){
+                    if (typeof data['recordTotalCount'] != "undefined") {
                         $scope.currentTable.recordTotalCount = parseInt(data['recordTotalCount']);
-                    }else{
+                    } else {
                         $scope.currentTable.recordTotalCount = data['data'].length;
                     }
 
@@ -343,9 +312,10 @@ angular.module('anTic')
 
                 $scope.calculatePagination();
                 $scope.checkDisplayOffsetAgainstRecordCount();
-                if(callback){
+                if (callback) {
                     callback();
-                };
+                }
+                ;
                 console.log($scope.currentTable);
 
             });
@@ -380,14 +350,14 @@ angular.module('anTic')
             var responsePromise = $http.post("interface/data.php", tableData);
             responsePromise.success(function (data, status, headers, config) {
 
-                if($scope.displayMode == "singleRecord"){
+                if ($scope.displayMode == "singleRecord") {
                     // Empty the data table if only editing a single record
                     $scope.currentTable.data = [];
                     $scope.currentTable.data.push(data['data'][0]);
 
                     // Rebuild the pkData if switching to single record / in single record dislay mode
                     $scope.rekeyPKData();
-                }else{
+                } else {
                     $scope.currentTable.data[dataRowID] = data['data'][0];
                 }
 
@@ -413,14 +383,14 @@ angular.module('anTic')
             }
             var responsePromise = $http.post("interface/data.php", tableData);
             responsePromise.success(function (data, status, headers, config) {
-                  //versionLogData
+                //versionLogData
                 console.log($scope.currentTable);
-                if($scope.displayMode == "singleRecord"){
+                if ($scope.displayMode == "singleRecord") {
                     // Empty the data table if only editing a single record
                     $scope.currentTable.versionLogData = {};
-                    $scope.currentTable.versionLogData = {0:data['data']};
+                    $scope.currentTable.versionLogData = {0: data['data']};
 
-                }else{
+                } else {
                     $scope.currentTable.versionLogData[dataRowID] = data['data'];
                 }
                 console.log("VersionData");
@@ -434,7 +404,7 @@ angular.module('anTic')
         }// end getRecord
 
 
-        $scope.getVersion = function (dataRowID,versionID){
+        $scope.getVersion = function (dataRowID, versionID) {
 
             var tableData = {};
             tableData.tableName = $scope.currentTableSelected;
@@ -451,17 +421,17 @@ angular.module('anTic')
             responsePromise.success(function (data, status, headers, config) {
                 //versionLogData
 
-                    // Empty the data table if only editing a single record
-                var intermediate = JSON.parse(data['data'],true);
+                // Empty the data table if only editing a single record
+                var intermediate = JSON.parse(data['data'], true);
 
-                if($scope.displayMode == "singleRecord"){
+                if ($scope.displayMode == "singleRecord") {
                     // Empty the data table if only editing a single record
                     $scope.currentTable.data = [];
                     $scope.currentTable.data.push(intermediate[0]);
 
                     // Rebuild the pkData if switching to single record / in single record dislay mode
                     $scope.rekeyPKData();
-                }else{
+                } else {
                     $scope.currentTable.data[dataRowID] = JSON.parse(intermediate[0]);
                 }
 
@@ -544,20 +514,20 @@ angular.module('anTic')
 
                 // Update version log display
 
-                if($scope.displayMode == "singleRecord") {
+                if ($scope.displayMode == "singleRecord") {
                     $scope.getVersionRecord(dataRowID);
                 }
 
 
-                });
+            });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
         }
 
 
-        $scope.saveAllPendingEdits = function(){
-            for(var s = 0;s < $scope.recordEditPending.length;s++){
+        $scope.saveAllPendingEdits = function () {
+            for (var s = 0; s < $scope.recordEditPending.length; s++) {
                 $scope.saveRecord($scope.recordEditPending[s]);
             }
         }
@@ -681,26 +651,54 @@ angular.module('anTic')
             $scope.currentTable.pkdata = newPKData;
 
         }//rekeyPKData
-        
+
+
+
+
+        // Run initializations
+
+        if($rootScope.userMeta == null){
+
+        }
+
+        $scope.initialRun();
+
+
+
+
 
     })
-    .controller("LoginController", function ($scope, $route, $location, $routeParams, $http, $filter,anTicUserMeta) {
+    .controller("LoginController", function ($scope,$rootScope, $route, $location, $routeParams, $http, $filter) {
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-
+console.log($rootScope.userMeta );
         $scope.userCredentials = {};
         $scope.userCredentials.password = "";
         $scope.userCredentials.email = "";
         $scope.loggedIn = false;
-        if(typeof $scope.userMeta == "undefined"){
-            anTicUserMeta.whoami(function(userMeta){
-                $scope.userMeta = anTicUserMeta.getUserMeta();
-                $scope.userCredentials.email = $scope.userMeta.email;
-                console.log($scope.userMeta);
+        $rootScope.userMeta = null;
+
+
+        $scope.whoami = function (callback) {
+            var crData = {};
+            crData.action = "whoami";
+
+            var responsePromise = $http.post("interface/user.php", crData);
+            responsePromise.success(function (data, status, headers, config) {
+                $rootScope.userMeta = data['data'];
+                if(typeof callback == 'function'){
+                    callback($rootScope.userMeta);
+                }else{
+                    return $rootScope.userMeta;
+                }
             });
-        }
+            responsePromise.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+        }// end whoami
 
+        $scope.whoami();
 
-        $scope.login = function(){
+        $scope.login = function () {
             var crData = {};
             crData.action = "login";
             crData.email = $scope.userCredentials.email;
@@ -708,9 +706,19 @@ angular.module('anTic')
 
             var responsePromise = $http.post("interface/user.php", crData);
             responsePromise.success(function (data, status, headers, config) {
-                anTicUserMeta.setUserSingleMeta('email',$scope.userCredentials.email);
-                anTicUserMeta.setUserSingleMeta('loggedIn',true);
-                $scope.userMeta = anTicUserMeta.getUserMeta();
+                if(data['status']=="success"){
+                    $rootScope.userMeta = {};
+                    $rootScope.userMeta.email = $scope.userCredentials.email;
+                    $scope.loggedIn = true;
+                    $scope.whoami(function(){
+                        $location.path("/table/");
+                    });
+
+                }else{
+                    $rootScope.userMeta = null;
+                    $scope.loggedIn = false;
+                }
+
             });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
@@ -719,9 +727,27 @@ angular.module('anTic')
             $scope.userCredentials.password = "";
         }// end login
 
+        $scope.logout = function () {
+            var crData = {};
+            crData.action = "logout";
+
+
+            var responsePromise = $http.post("interface/user.php", crData);
+            responsePromise.success(function (data, status, headers, config) {
+                $rootScope.userMeta = null;
+                $scope.loggedIn = false;
+                $location.path("/login/");
+
+            });
+            responsePromise.error(function (data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+
+            $scope.userCredentials.password = "";
+        }// end logout
 
     })
-    .controller("SystemController", function ($scope, $route, $location, $routeParams, $http, $filter) {
+    .controller("SystemController", function ($scope, $rootScope,$route, $location, $routeParams, $http, $filter) {
         $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 
 
@@ -735,7 +761,7 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/tablefield.html'
         }
     })
-    .directive("datatable",function(){
+    .directive("datatable", function () {
         return {
             restrict: 'E',
             replace: 'true',
@@ -743,7 +769,7 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/dataTable.html'
         }
     })
-    .directive("singlerecordcontrols",function(){
+    .directive("singlerecordcontrols", function () {
         return {
             restrict: 'E',
             replace: 'true',
@@ -751,7 +777,7 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/singleRecordControls.html'
         }
     })
-    .directive("tablerecordcontrols",function(){
+    .directive("tablerecordcontrols", function () {
         return {
             restrict: 'E',
             replace: 'true',
@@ -759,7 +785,7 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/tableRecordControls.html'
         }
     })
-    .directive("singlerecordedit",function(){
+    .directive("singlerecordedit", function () {
         return {
             restrict: 'E',
             replace: 'true',
@@ -767,7 +793,7 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/singleRecordEdit.html'
         }
     })
-    .directive("tablelistpagination",function(){
+    .directive("tablelistpagination", function () {
         return {
             restrict: 'E',
             replace: 'true',
@@ -775,7 +801,7 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/tableListPagination.html'
         }
     })
-    .directive("recordlogs",function(){
+    .directive("recordlogs", function () {
         return {
             restrict: 'E',
             replace: 'true',
@@ -783,7 +809,15 @@ angular.module('anTic')
             templateUrl: 'partials/directive-templates/recordlogs.html'
         }
     })
-    .directive("tableselect",function(){
+    .directive("headerloginbutton", function () {
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/headerLoginButton.html'
+        }
+    })
+    .directive("tableselect", function () {
         return {
             restrict: 'E',
             replace: 'true',

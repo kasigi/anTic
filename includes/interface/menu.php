@@ -12,6 +12,9 @@
                             <span class="icon-bar"></span>
                         </button>
                         <div id="tnj-headermenu-mobile-search">
+                            <headerloginbutton></headerloginbutton>
+
+                            <!--
                             <form class="navbar-form navbar-left searchform" role="search" method="get" id="searchform3" action="http://www.kasigi.com/">
                                 <label class="tnj-accessable-hide" for="s3">Search</label>
                                 <div class="input-group">
@@ -19,8 +22,8 @@
 				      <span class="input-group-btn">
 					<button class="btn btn-default" type="submit">Search</button>
 				      </span>
-                                </div><!-- /input-group -->
-                            </form>
+                                </div>
+                            </form>-->
                         </div><!-- end # tnj-headermenu-mobile-search -->
                     </div><!-- end navbar-header-->
 
@@ -59,7 +62,9 @@
                             </li>
                         </ul>
                     </div>
-                    <form class="navbar-form navbar-right hidden-sm hidden-md searchform" role="search" method="get" id="searchform" action="http://www.kasigi.com/">
+                    <headerloginbutton></headerloginbutton>
+
+                    <!--<form class="navbar-form navbar-right hidden-sm hidden-md searchform" role="search" method="get" id="searchform" action="http://www.kasigi.com/">
                         <label class="tnj-accessable-hide" for="s">Search</label>
                         <div class="input-group">
 
@@ -67,8 +72,8 @@
 				      <span class="input-group-btn">
 					    <button class="btn btn-default" type="submit">Search</button>
 				      </span>
-                        </div><!-- /input-group -->
-                    </form>
+                        </div>
+                    </form>-->
 
                 </nav>
             </div><!-- end col-md-12 -->
@@ -79,15 +84,17 @@
     <div class="container visible-sm visible-md">
         <div class="row">
             <div class="col-md-12 tnj-headermenu-under">
-                <form class="navbar-form navbar-right searchform" role="search" method="get" id="searchform2" action="http://www.kasigi.com/">
-                    <label class="tnj-accessable-hide" for="s2">Search</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="s" id="s2">
-				      <span class="input-group-btn">
-					<button class="btn btn-default" type="submit">Search</button>
-				      </span>
-                    </div><!-- /input-group -->
-                </form>
+                <headerloginbutton></headerloginbutton>
+
+                <!--                <form class="navbar-form navbar-right searchform" role="search" method="get" id="searchform2" action="http://www.kasigi.com/">
+                                    <label class="tnj-accessable-hide" for="s2">Search</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search" name="s" id="s2">
+                                      <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit">Search</button>
+                                      </span>
+                                    </div>
+                                </form>-->
             </div><!-- end col-md-12 -->
         </div><!-- row -->
     </div><!-- end container -->
@@ -95,8 +102,3 @@
 
 </div>
 
-<div ng-controller="LoginController">
-    <p>Email</p>
-    {{userMeta}}
-    <p ng-bind="userMeta.email"></p>
-</div>

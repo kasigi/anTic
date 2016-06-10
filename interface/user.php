@@ -10,7 +10,7 @@ $anTicUser = new anTicUser;
 $requestedActionInputs = $anTicUser->gatherInputs();
 
 if($requestedActionInputs['action'] == "login"){
-    $response = $anTicUser->login($requestedActionInputs['userEmail'],$requestedActionInputs['password']);
+    $response = $anTicUser->login($requestedActionInputs['email'],$requestedActionInputs['password']);
 
     echo json_encode($response);
 }// end login

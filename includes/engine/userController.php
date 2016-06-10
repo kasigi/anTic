@@ -70,12 +70,11 @@ class anTicUser {
 
         $returnArr = [];
         $returnArr['action'] = $aRequest['action'];
-        $returnArr['userEmail'] = $aRequest['userEmail'];
+        $returnArr['email'] = $aRequest['email'];
         $returnArr['password'] = $aRequest['password'];
         return $returnArr;
 
     }// end function gatherInputs
-
 
 
     function checkLogin(){
@@ -118,7 +117,6 @@ class anTicUser {
         unset($_SESSION['userID']);
         unset($_SESSION['userMeta']);
     }//logout
-
 
 /*
  * Authenticates a user with email address and password.
