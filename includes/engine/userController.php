@@ -80,7 +80,7 @@ class anTicUser {
     function checkLogin(){
         // Checks for the presence of a logged in user
 
-        if($_SESSION['fullyAuthenticated']!==true && (!isset($_SESSION['userID']) || $_SESSION['userID']<=0)){
+        if((!isset($_SESSION['userID']) || $_SESSION['userID']<=0)){
             return false;
         }else{
             return true;
@@ -277,6 +277,9 @@ AND P.userID = :userID) as PMU;";
         }else{
             while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $output['status'] = "success";
+                foreach($data as $key=>$value){
+                    $data[$key]=intval($value);
+                }
                 $output['data'] = $data;
                 //$output['sql']=$sql;
             }
@@ -284,6 +287,14 @@ AND P.userID = :userID) as PMU;";
 
         return $output;
     } // permissionCheck
+
+
+
+
+
+
+
+
 
 
 } // end class anTicUser

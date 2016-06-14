@@ -1,6 +1,6 @@
 <?php
 
-//error_reporting(E_ERROR | E_PARSE);
+error_reporting(E_ERROR | E_PARSE | E_WARNING);
 
 
 require_once(dirname(__FILE__).'/../includes/engine/engine.php');
@@ -33,7 +33,7 @@ if($requestedActionInputs['action'] == "whoami"){
 
 
 
-    if($requestedActionInputs['action'] == "setpassword"){
+if($requestedActionInputs['action'] == "setpassword"){
     $response = $anTicUser->setPassword(null,$requestedActionInputs['password']);
 
     echo json_encode($response);

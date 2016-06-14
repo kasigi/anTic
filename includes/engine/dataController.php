@@ -5,7 +5,7 @@ class anTicData
 
     public $db;
     public $dataModels;
-    public $validRequests = array("get","getversion", "getversionlog","getall", "set", "delete", "add","buildModels");
+    public $validRequests = array("get","getversion", "getversionlog","getall", "set", "delete", "add","buildmodels","getpermissionlist");
     public $validDataModelTypes = array("data", "system");
     public $permissionFieldNames = array("anticRead","anticWrite","anticExecute","anticAdminister");
 
@@ -475,9 +475,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
                             AND (UP.groupID IS NOT NULL\n
                             OR PMU.userID = $userID)\n
                         ) AS PMUT ON 1=1\n
-                        Having anticRead = 1";
+                        WHERE readT=1 OR readR=1";
         $sql = $sqlStart.$sqlPart2;
-                $countSql = "SELECT count(*) as recordTotalCount " . $sqlPart2; // This is the query used to determine total number of records
+        $countSql = "SELECT count(*) as recordTotalCount " . $sqlPart2; // This is the query used to determine total number of records
 
         //$this->addWhereToQuery($sql,$primaryRecordKeys);
         $sql = $this->addLimitsToQuery($sql);
@@ -1000,7 +1000,70 @@ AND i.TABLE_SCHEMA = DATABASE();";
         return $sql;
     }// end addLimitsToQuery
 
-    
+
+    function getPermissionList($tableName,$primaryKeys){
+        if(isset($primaryKeys)){
+            $pkArrayBaseJsonWhere = " OR pkArrayBaseJson = :pkJSON";
+        }else{
+            $pkArrayBaseJsonWhere = "";
+        }
+
+        $sql = "SELECT 
+                id,
+                userID,
+                groupID,
+                IF(pkArrayBaseJson IS NULL or pkArrayBaseJson = \"\",0,1) as isRecordSpecific,
+                `read` as anticRead,`write` as anticWrite,`execute` as anticExecute,
+                `administer` as anticAdminister
+             FROM anticPermission
+            WHERE tableName = :tableName
+            AND pkArrayBaseJson IS NULL
+            OR pkArrayBaseJson = \"\"
+            $pkArrayBaseJsonWhere";
+
+        $this->initDB();
+        $statement = $this->db->prepare($sql);
+
+        $statement->bindValue(':tableName', $tableName);
+
+        if(isset($primaryKeys)) {
+            if(is_array($primaryKeys)){
+                $primaryKeys = json_encode($primaryKeys);
+            }
+            $statement->bindValue(':pkJSON', $primaryKeys);
+        }
+
+        $success = $statement->execute();
+
+        $output = null;
+       // $output['sql']=$sql;
+       // $output['pkBind']=$primaryKeys;
+        if (!$success) {
+            $output['status'] = "error";
+            $output['error'] = $statement->errorCode();
+            $output['sqlError'] = $statement->errorInfo();
+            //$output['sqlError']['sql']=$sql;
+        }else{
+            $output['status'] = "success";
+            while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
+                foreach($data as $key=>$value){
+                    if(in_array($key,$this->permissionFieldNames) || $key == "isRecordSpecific"){
+                        $data[$key]=intval($value);
+                    }
+                }
+                $output['data'][] = $data;
+                //$output['sql']=$sql;
+            }
+        }
+
+        return $output;
+
+    }// getPermissionList
+
+
+
+
+
     function returnError($message)
     {
 
