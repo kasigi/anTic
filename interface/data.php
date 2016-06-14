@@ -97,7 +97,7 @@ if($requestedActionInputs['action']=="set"){
 
 if($requestedActionInputs['action']=="delete"){
     // Delete the data
-    $response = $anTicData->dataSet($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys']);
+    $response = $anTicData->dataDelete($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys']);
 
     // Return JSON
     echo json_encode($response);

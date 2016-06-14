@@ -4,7 +4,7 @@
 
 
 require_once(dirname(__FILE__).'/../includes/engine/engine.php');
-
+global $anTicUser;
 $anTicUser = new anTicUser;
 
 $requestedActionInputs = $anTicUser->gatherInputs();

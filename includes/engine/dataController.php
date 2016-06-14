@@ -7,7 +7,7 @@ class anTicData
     public $dataModels;
     public $validRequests = array("get","getversion", "getversionlog","getall", "set", "delete", "add","buildModels");
     public $validDataModelTypes = array("data", "system");
-
+    public $permissionFieldNames = array("anticRead","anticWrite","anticExecute","anticAdminister");
 
     function anTicData()
     {
@@ -329,37 +329,159 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
     }// end function gatherInputs
 
+    /*
+     * This will create a concat statement that can be used in where and join clauses that turns
+     * the primary key set into a json object
+     * @param $primaryRecordKeys array  Associative array of primary keys
+     * @param $tableAlias string Alias used in the SQL query for the table name.
+     */
+    function makeMySQLJsonConcat($primaryRecordKeys,$tableAlias){
+
+        if($primaryRecordKeys == ""){
+            return null;
+        }
+
+        if($tableAlias == ""){
+            $tableAlias = "T";
+        }else{
+            $tableAlias = preg_replace("/[^a-zA-Z0-9\$_]/", "", $tableAlias);
+        }
+
+        $keySet = [];
+        foreach($primaryRecordKeys as $keyName => $keyValue){
+            $keyValue = preg_replace("/[^a-zA-Z0-9\$_]/", "", $keyValue);
+            $keySet[] = "\"$keyValue\":\"',$tableAlias.$keyValue,'\"";
+        }
+
+        $output = "CONCAT('{".implode(",",$keySet)."}')";
+
+        return $output;
+
+    }// end makeMySQLJsonConcat
+
+
+    /*
+     * This will cause the anticUser class to verify the login of the user and will trigger a failure if they are not logged in
+     */
+    function dataCheckLogin(){
+        global $anTicUser;
+
+        if(!$anTicUser instanceof anticUser){
+            $anTicUser = new anticUser;
+        }
+        if(!$anTicUser->checkLogin()){
+            // User is not logged in
+            $output['status'] = "error";
+            $output['error'] = "Not logged in";
+            return $output;
+        }else{
+            return true;
+        }
+    }// end dataCheckLogin
+
+
 
     function dataGetAll($targetTable)
     {
+        $loginStatus = $this->dataCheckLogin();
+        if($loginStatus !== true){
+            return $loginStatus;
+        };
+
         $bindArray = [];
         $fieldArray = [];
-        $fieldListString = "*";
+        $fieldListString = "TR.*";
         // Look for listViewDisplayFields
         if (isset($this->dataModels['data'][$targetTable]['listViewDisplayFields'])) {
 
             // Add the manually specified display fields
             foreach ($this->dataModels['data'][$targetTable]['listViewDisplayFields'] as $fieldName) {
                 if (!in_array($fieldName, $fieldArray)) {
-                    $fieldArray[] = $fieldName;
+                    $fieldArray[] = "TR.".$fieldName;
                 }
             }
 
             // Primary keys are mandatory fields and must be added if not already specified
             foreach ($this->dataModels['data'][$targetTable]['primaryKey'] as $fieldName) {
                 if (!in_array($fieldName, $fieldArray)) {
-                    $fieldArray[] = $fieldName;
+                    $fieldArray[] = "TR.".$fieldName;
                 }
             }
 
             $fieldListString = implode(", ", $fieldArray);
         }
+        $userID = intval($_SESSION['userID']);
 
-        $sql = "SELECT $fieldListString FROM $targetTable";  // This is the main query
-        $countSql = "SELECT count(*) as recordTotalCount FROM $targetTable"; // This is the query used to determine total number of records
+        $pkArrayBaseJSONConcat = $this->makeMySQLJsonConcat($this->dataModels['data'][$targetTable]['primaryKey'],"T");
+        $joinStringArr = [];
+        $pkPermSelectArr = [];
+
+        // Primary Keys Present
+        foreach($this->dataModels['data'][$targetTable]['primaryKey'] as $fieldName){
+            $joinStringArr[] = "PMRec.$fieldName = TR.$fieldName";
+            $pkPermSelectArr[] = "T.$fieldName";
+        }
+
+        if(count($joinStringArr)==0){
+            // Table does not have primary keys, use ALL keys
+            $pkFieldStandin = [];
+            foreach($this->dataModels['data'][$targetTable]['fields'] as $fieldName => $fieldData){
+                $joinStringArr[] = "PMRec.$fieldName = TR.$fieldName";
+                $pkPermSelectArr[] = "T.$fieldName";
+                $pkFieldStandin[]=$fieldName;
+            }
+            $pkArrayBaseJSONConcat = $this->makeMySQLJsonConcat($pkFieldStandin,"T");
+
+        }
+
+        $joinString = implode(" AND ",$joinStringArr);
+        $pkPermSelect = implode(", ",$pkPermSelectArr);
+
+
+        $sqlStart = "SELECT $fieldListString ,\n
+                        IF(readR>readT,readR,readT) as `anticRead`,\n
+                        IF(writeR>writeT,writeR,writeT) as `anticWrite`,\n
+                        IF(executeR>executeT,executeR,executeT) as `anticExecute`,\n
+                        IF(administerR>administerT,administerR,administerT) as `anticAdminister`\n";  // This is the main query
+        $sqlPart2 = " FROM $targetTable TR\n
+                LEFT JOIN (SELECT \n
+                    $pkPermSelect , /* All Primary Keys*/\n
+                    IF(sum(PMU.`read`)>=1,1,0) as `readR`, \n
+                    IF(sum(PMU.`write`)>=1,1,0) as `writeR`,\n
+                    IF(sum(PMU.`execute`)>=1,1,0) as `executeR`,\n
+                    IF(sum(PMU.administer)>=1,1,0) as `administerR` \n
+                FROM anticPermission PMU\n
+                INNER JOIN anticUserGroup UG \n
+                    ON (UG.groupID = PMU.groupID AND UG.userID=$userID) \n
+                        OR ((PMU.groupID IS NULL OR PMU.groupID=\"\") AND PMU.userID = $userID )\n
+                INNER JOIN $targetTable T ON \n
+                    PMU.pkArrayBaseJSON = $pkArrayBaseJSONConcat\n
+                GROUP BY PMU.pkArrayBaseJSON) AS PMRec \n
+                    ON $joinString /*Join on All Primary Keys*/\n
+                /*Join in the Table Level Permissions*/\n
+                LEFT JOIN \n
+                        (SELECT IF(sum(PMU.`read`)>=1,1,0) as `readT`, \n
+                                IF(sum(PMU.`write`)>=1,1,0) as `writeT`,\n
+                                IF(sum(PMU.`execute`)>=1,1,0) as `executeT`,\n
+                                IF(sum(PMU.`administer`)>=1,1,0) as `administerT` \n
+                            FROM anticPermission PMU\n
+                        LEFT JOIN anticUserGroup UP \n
+                            ON (UP.groupID = PMU.groupID \n
+                            AND UP.userID = $userID)\n
+                            AND (PMU.pkArrayBaseJSON IS NULL OR PMU.pkArrayBaseJSON = \"\")\n
+                        WHERE \n
+                            PMU.tableName = \"$targetTable\"\n
+                            AND (PMU.pkArrayBaseJSON IS NULL OR PMU.pkArrayBaseJSON = \"\")\n
+                            AND (UP.groupID IS NOT NULL\n
+                            OR PMU.userID = $userID)\n
+                        ) AS PMUT ON 1=1\n
+                        Having anticRead = 1";
+        $sql = $sqlStart.$sqlPart2;
+                $countSql = "SELECT count(*) as recordTotalCount " . $sqlPart2; // This is the query used to determine total number of records
 
         //$this->addWhereToQuery($sql,$primaryRecordKeys);
         $sql = $this->addLimitsToQuery($sql);
+
 
         // Run Query
         $statement = $this->db->prepare($sql);
@@ -372,6 +494,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
             $output['status'] = "error";
             $output['error'] = $statement->errorCode();
             $output['sqlError'] = $statement->errorInfo();
+            //$output['sql']=$sql;
             //$output['sqlError']['sql']=$sql;
             return $output;
         }
@@ -379,9 +502,22 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         // Process Results
         $output = null;
+        //$output['sql']=$sql;
+        $v=0;
         while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
             $output['status'] = "success";
-            $output['data'][] = $data;
+            $recordData = [];
+            $recordPerm = [];
+            foreach($data as $fieldName => $value){
+                if(in_array($fieldName,$this->permissionFieldNames)){
+                    $recordPerm[$fieldName]=intval($value);
+                }else{
+                    $recordData[$fieldName]=$value;
+                }
+            }
+            $output['data'][$v] = $recordData;
+            $output['permission'][$v]=$recordPerm;
+            $v++;
             //$output['sql']=$sql;
         }
 
@@ -443,6 +579,20 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
     function dataGet($targetTable, $primaryRecordKeys)
     {
+        global $anTicUser;
+        $loginStatus = $this->dataCheckLogin();
+        if($loginStatus !== true){
+            return $loginStatus;
+        };
+
+        $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
+
+        if($permissions['data']['anticRead']!=1){
+            $output['status'] = "error";
+            $output['error'] = "Inadequate permissions or record does not exist";
+            return $output;
+        }
+
         $bindArray = [];
         $sql = "SELECT * FROM $targetTable";
         // Run Query
@@ -487,7 +637,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
             $output['data'][] = $data;
             //$output['sql']=$sql;
         }
-
+        $output['permission'][0]=$permissions['data'];
 
         $foreignKeyTables = [];
         // look for Foreign Key fields
@@ -609,6 +759,21 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
     function dataDelete($targetTable, $primaryRecordKeys)
     {
+        global $anTicUser;
+        $loginStatus = $this->dataCheckLogin();
+        if($loginStatus !== true){
+            return $loginStatus;
+        };
+
+        $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
+
+        if($permissions['data']['anticWrite']!=1){
+            $output['status'] = "error";
+            $output['error'] = "Inadequate permissions or record does not exist";
+            return $output;
+        }
+
+
         $bindArray = [];
 
         if (count($primaryRecordKeys) == 0) {
@@ -654,6 +819,20 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
     function dataSet($targetTable, $primaryRecordKeys, $inputData)
     {
+        global $anTicUser;
+        $loginStatus = $this->dataCheckLogin();
+        if($loginStatus !== true){
+            return $loginStatus;
+        };
+
+        $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
+
+        if($permissions['data']['anticWrite']!=1){
+            $output['status'] = "error";
+            $output['error'] = "Inadequate permissions or record does not exist";
+            return $output;
+        }
+
         $bindArray = [];
 
         if (count($primaryRecordKeys) == 0) {
@@ -711,6 +890,19 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
     function dataAdd($targetTable, $inputData)
     {
+        global $anTicUser;
+        $loginStatus = $this->dataCheckLogin();
+        if($loginStatus !== true){
+            return $loginStatus;
+        };
+
+        $permissions = $anTicUser->permissionCheck($targetTable);
+
+        if($permissions['data']['anticWrite']!=1){
+            $output['status'] = "error";
+            $output['error'] = "Inadequate permissions";
+            return $output;
+        }
         $bindArray = [];
 
         // INSERT INTO tbl_name (col1,col2) VALUES(15,col1*2);

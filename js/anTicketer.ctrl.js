@@ -309,6 +309,11 @@ angular.module('anTic')
                 } else {
                     $scope.currentTable.fkdata = {};
                 }
+                if (data.hasOwnProperty("permission")) {
+                    $scope.currentTable.permission = data['permission'];
+                } else {
+                    $scope.currentTable.permission = {};
+                }
 
                 $scope.calculatePagination();
                 $scope.checkDisplayOffsetAgainstRecordCount();

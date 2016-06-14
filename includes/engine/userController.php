@@ -191,7 +191,7 @@ class anTicUser {
         if($userID != $_SESSION['userID']){
             // Changing password for another user. Verify permission.
             $permissions = $this->permissionCheck("anticUser");
-            if(!isset($permissions['data']['write']) || $permissions['data']['write']!=1) {
+            if(!isset($permissions['data']['anticWrite']) || $permissions['data']['anticWrite']!=1) {
                 // User does not have admin power over user table
                 return false;
             }
@@ -246,15 +246,15 @@ class anTicUser {
         }
         $this->initDB();
 
-        $sql = "SELECT IF(sum(PMU.read)>=1,1,0) as `read`, IF(sum(PMU.write)>=1,1,0) as `write`,IF(sum(PMU.execute)>=1,1,0) as `execute`,IF(sum(PMU.administer)>=1,1,0) as `administer` FROM
+        $sql = "SELECT IF(sum(PMU.read)>=1,1,0) as `anticRead`, IF(sum(PMU.write)>=1,1,0) as `anticWrite`,IF(sum(PMU.execute)>=1,1,0) as `anticExecute`,IF(sum(PMU.administer)>=1,1,0) as `anticAdminister` FROM
 (SELECT P.* FROM anticPermission P
 INNER JOIN anticUserGroup UP ON UP.groupID = P.groupID AND UP.userID = :userID
 WHERE P.tableName = :tableName
-AND (P.pkArrayBaseJSON IS NULL OR P.pkArrayBaseJSON = :pkJSON)
+AND (P.pkArrayBaseJSON IS NULL OR P.pkArrayBaseJSON = '' OR P.pkArrayBaseJSON = :pkJSON)
 UNION 
 SELECT P.* FROM anticPermission P
 WHERE P.tableName = :tableName
-AND (P.pkArrayBaseJSON IS NULL OR P.pkArrayBaseJSON = :pkJSON)
+AND (P.pkArrayBaseJSON IS NULL OR P.pkArrayBaseJSON = '' OR P.pkArrayBaseJSON = :pkJSON)
 AND P.groupID IS NULL
 AND P.userID = :userID) as PMU;";
 
