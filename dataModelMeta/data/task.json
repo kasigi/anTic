@@ -11,8 +11,11 @@
       "helpText":"This is the currently assigned user in the system who is working on the task",
       "displayName":"Assigned Person",
       "foreignKeyDisplayFields":["firstName","lastName"]
+    },
+    "priorityID":{
+	"displayName":"Priority"
     }
   },
-  "listViewDisplayFields": ["person","status","projectTypeID","title"]
+  "listViewDisplayFields": ["person","status","priorityID","projectTypeID","title"]
 
 }
