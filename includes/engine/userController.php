@@ -4,7 +4,7 @@
 class anTicUser {
 
     public $db;
-    public $validRequests = array("login","logout","setpassword","whoami");
+    public $validRequests = array("login","logout","setpassword","whoami","listgroups");
 
     function anTicUser(){
 
@@ -68,10 +68,13 @@ class anTicUser {
 
 
 
+
         $returnArr = [];
         $returnArr['action'] = $aRequest['action'];
         $returnArr['email'] = $aRequest['email'];
         $returnArr['password'] = $aRequest['password'];
+        $returnArr['groupIDs'] = $aRequest['groupIDs'];
+
         return $returnArr;
 
     }// end function gatherInputs
@@ -288,7 +291,49 @@ AND P.userID = :userID) as PMU;";
         return $output;
     } // permissionCheck
 
+    function listGroups($groupIDs){
+        if(!isset($userID)){
+            $userID = $_SESSION['userID'];
+        }else{
+            $userID = intval($userID);
+            if($userID <=0){
+                return false;
+            }
+        }
 
+        $groupWhere = "";
+        if($groupIDs != ""){
+            if(is_array($groupIDs)){
+                foreach($groupIDs as $key=>$value){
+                    $groupIDs[$key] = intval($value);
+                }
+                $groupIDs = implode(",",$groupIDs);
+            }else{
+                $groupIDs  = preg_replace("/[^0-9,]/", "", $groupIDs);
+            }
+
+            $groupWhere = "WHERE groupID in ($groupIDs)";
+        }
+
+        $sql = "SELECT * FROM anticGroup $groupWhere";
+
+        $this->initDB();
+        $statement = $this->db->prepare($sql);
+        $success = $statement->execute();
+
+        if (!$success) {
+            $output['status'] = "error";
+            $output['error'] = $statement->errorCode();
+            $output['sqlError'] = $statement->errorInfo();
+        }else{
+            while ($data = $statement->fetchAll(PDO::FETCH_ASSOC)) {
+                $output['status'] = "success";
+
+                $output['data'] = $data;
+            }
+        }
+
+    }//listGroups
 
 
 

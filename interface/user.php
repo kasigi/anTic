@@ -31,6 +31,11 @@ if($requestedActionInputs['action'] == "whoami"){
     echo json_encode($response);
 }//whoami
 
+if($requestedActionInputs['action'] == "listgroups"){
+    $response = $anTicUser->listGroups($requestedActionInputs['groupIDs']);
+
+    echo json_encode($response);
+}//listgroups
 
 
 if($requestedActionInputs['action'] == "setpassword"){
