@@ -3,12 +3,24 @@
 
 require_once(dirname(__FILE__).'/../includes/engine/engine.php');
 $anTicData = new anTicData;
+$anTicUser = new anTicUser;
+
+if(!$anTicUser->checkLogin()){
+    echo "Not logged in";
+    die;
+}
 
 $anTicData->initDB();
 $models = $anTicData->buildDataModels('data');
 
 if($_REQUEST['tableName']!=""){
 // Check for valid table name
+    $permissions = $anTicUser->permissionCheck($_REQUEST['tableName']);
+
+    if($permissions['data']['anticRead']!=1){
+        var_dump($permissions);
+        die;
+    }
 
     $targetTable = preg_replace("/[^a-zA-Z0-9\-_\.]/", "", $_REQUEST['tableName']);
 
@@ -18,8 +30,49 @@ if($_REQUEST['tableName']!=""){
     }
     $fileName = $targetTable.".csv";
 
-    $sql = "SELECT * FROM $targetTable";
 
+
+    if($_REQUEST['includeFKDisplay']==1){
+        // Include the display fields from foreign key parent tables
+
+        $foreignKeyTables = [];
+        $fkSelectFields = "";
+        $fkSelectJoin = "";
+        $selectFields = [];
+        $joinIndex = 1;
+        // look for Foreign Key fields
+        foreach ($anTicData->dataModels['data'][$targetTable]['fields'] as $fieldName => $field) {
+            // Add the base field
+            $selectFields[] = "T0.$fieldName";
+
+            // Create list of foreignKeyTables and all required fields
+            if (isset($field['foreignKeyTable'])) {
+                if (!isset($foreignKeyTables[$field['foreignKeyTable']])) {
+                    $foreignKeyTables[$field['foreignKeyTable']] = [];
+                    $fkSelectJoin .= "\nLEFT JOIN ".$field['foreignKeyTable']." T$joinIndex ON T0.$fieldName = T$joinIndex.".$field['foreignKeyColumns'][0]." \n";
+                }
+
+
+                if (isset($field['foreignKeyDisplayFields'])) {
+                    foreach ($field['foreignKeyDisplayFields'] as $fkField) {
+                        if (!in_array($fkField, $foreignKeyTables[$field['foreignKeyTable']])) {
+                            $selectFields[] = "T$joinIndex.$fkField";
+                        }
+                    }
+                }
+                $joinIndex++;
+            }
+        }
+
+        // Get the foreign key data tables
+
+
+
+
+        $sql = "SELECT ".implode(", ",$selectFields)." FROM $targetTable T0 $fkSelectJoin";
+    }else{
+        $sql = "SELECT * FROM $targetTable";
+    }
 
     $statement = $anTicData->db->prepare($sql);
     $statement->execute();
@@ -30,7 +83,13 @@ if($_REQUEST['tableName']!=""){
     }
 
 
-    if($output)
+
+
+
+
+
+
+    if($output ){
 
     header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
     header('Content-Description: File Transfer');
@@ -58,6 +117,7 @@ if($_REQUEST['tableName']!=""){
     fclose($fh);
 // Make sure nothing else is sent, our file is done
     exit;
+    }
 }
 
 
