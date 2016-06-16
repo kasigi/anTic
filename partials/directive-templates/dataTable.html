@@ -16,8 +16,14 @@
                     <div class="btn-group" role="group" aria-label="Table-level Controls">
                         <select name="displayCount" class="btn btn-default" ng-model="displayCount" ng-change="setDisplayCount(displayCount)" ng-options="value for value in displayCountOptions">
                         </select>
-
-                        <a class="btn btn-default" href="interface/csv.php?tableName={{ currentTableSelected }}"><span class="glyphicon glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download CSV</a>
+ <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Download CSV <span class="glyphicon glyphicon glyphicon-download-alt" aria-hidden="true"></span> <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="interface/csv.php?tableName={{ currentTableSelected }}">RAW</a></li>
+    <li><a href="interface/csv.php?tableName={{ currentTableSelected }}&includeFKDisplay=1">w/Foreign Keys</a></li>
+    
+  </ul>
                     </div>
 
                 </th>
