@@ -18,7 +18,7 @@ if($_REQUEST['tableName']!=""){
     $permissions = $anTicUser->permissionCheck($_REQUEST['tableName']);
 
     if($permissions['data']['anticRead']!=1){
-        var_dump($permissions);
+        echo "Not allowed to read table";
         die;
     }
 
