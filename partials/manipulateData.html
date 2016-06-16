@@ -53,6 +53,7 @@
 
                 <ul class="nav nav-tabs " role="tablist">
                     <li role="presentation" class="active"><a data-target="#editRecord" aria-controls="editRecord" role="tab" data-toggle="tab">Edit Record</a></li>
+                    <li role="presentation" ng-if="currentTable.permissionList.length > 0"><a data-target="#editRecordPermissions" aria-controls="editRecordPermissions" role="tab" data-toggle="tab">Permissions</a></li>
                     <li role="presentation"><a data-target="#editRecordLogs" aria-controls="editRecordLogs" role="tab" data-toggle="tab">View Log / Versions</a></li>
 
                 </ul>
@@ -64,6 +65,9 @@
                             <singlerecordedit></singlerecordedit>
                         </div>
 
+                        <div role="tabpanel" class="tab-pane" id="editRecordPermissions" ng-if="currentTable.permissionList.length > 0">
+                            <permissionsingle></permissionsingle>
+                        </div>
 
                         <div role="tabpanel" class="tab-pane" id="editRecordLogs">
                             <recordlogs></recordlogs>

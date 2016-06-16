@@ -11,6 +11,8 @@ angular.module('anTic')
         $scope.currentTable.recordTotalCount = 0;
         $scope.currentTable.fkdata = {};
         $scope.currentTable.pkdata = {};
+        $scope.currentTable.permission = [];
+        $scope.currentTable.permissionList = [];
         $scope.recordEditPending = [];
         $scope.recordDeletePending = [];
         $scope.fieldTypeMapping = {};
@@ -18,6 +20,7 @@ angular.module('anTic')
         $scope.singleRecordTarget = {};
         $scope.displayCountOptions = [5, 10, 50, 100, 250, 1000, 5000];
         $scope.paginationOptions = [];
+
 
         $scope.initialRun = function(){
 
@@ -309,6 +312,11 @@ angular.module('anTic')
                 } else {
                     $scope.currentTable.fkdata = {};
                 }
+                if (data.hasOwnProperty("permission")) {
+                    $scope.currentTable.permission = data['permission'];
+                } else {
+                    $scope.currentTable.permission = {};
+                }
 
                 $scope.calculatePagination();
                 $scope.checkDisplayOffsetAgainstRecordCount();
@@ -361,11 +369,42 @@ angular.module('anTic')
                     $scope.currentTable.data[dataRowID] = data['data'][0];
                 }
 
+                if(data['permission'][0]['anticAdminister']==1){
+                    // User can administer the record
+                    tableData.action = "getPermissionList";
+                    delete tableData.count;
+                    delete tableData.offset;
+                    var responsePromisePerm = $http.post("interface/data.php", tableData);
+                    responsePromisePerm.success(function (data, status, headers, config) {
+
+                        if ($scope.displayMode == "singleRecord") {
+                            // Empty the data table if only editing a single record
+                            $scope.currentTable.permissionList = [];
+                            $scope.currentTable.permissionList.push(data['data']);
+
+                            // Rebuild the pkData if switching to single record / in single record dislay mode
+                            $scope.rekeyPKData();
+                        } else {
+                            $scope.currentTable.permissionList[dataRowID] = data['data'];
+                        }
+console.log($scope.currentTable);
+
+                    });
+                    responsePromisePerm.error(function (data, status, headers, config) {
+                        alert("AJAX failed!");
+                    });
+                }else{
+                    $scope.currentTable.permissionList = [];
+                }
+
+
 
             });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
+
+
 
         }// end getRecord
 
@@ -824,7 +863,24 @@ console.log($rootScope.userMeta );
             scope: false,
             templateUrl: 'partials/directive-templates/tableSelect.html'
         }
-    });
+    })
+    .directive("permissionsingle", function () {
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/permissionSingle.html'
+        }
+    })
+    .directive("permissiontable", function () {
+        return {
+            restrict: 'E',
+            replace: 'true',
+            scope: false,
+            templateUrl: 'partials/directive-templates/permissionTable.html'
+        }
+    })
+;
 
 
 

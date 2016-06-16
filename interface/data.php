@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ERROR | E_PARSE);
+error_reporting(E_ERROR | E_PARSE | E_WARNING);
 
 
 require_once(dirname(__FILE__).'/../includes/engine/engine.php');
@@ -39,7 +39,6 @@ if($requestedActionInputs['action']=="get"){
     echo json_encode($response);
 
 }// end get
-
 
 if($requestedActionInputs['action']=="getversion"){
     // Get the data
@@ -97,7 +96,7 @@ if($requestedActionInputs['action']=="set"){
 
 if($requestedActionInputs['action']=="delete"){
     // Delete the data
-    $response = $anTicData->dataSet($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys']);
+    $response = $anTicData->dataDelete($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys']);
 
     // Return JSON
     echo json_encode($response);
@@ -113,6 +112,13 @@ if($requestedActionInputs['action']=="add"){
 }
 
 
+if($requestedActionInputs['action']=="getpermissionlist"){
+
+    $response = $anTicData->getPermissionList($requestedActionInputs['targetTable'],$requestedActionInputs['primaryRecordKeys']);
+
+    // Return JSON
+    echo json_encode($response);
+}
 
 
 

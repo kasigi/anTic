@@ -1,0 +1,66 @@
+<div class="">
+    <section class="row">
+        <div class="col-md-12">
+            <h1>Record Level Permissions</h1>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>PermID</th>
+                        <th>Type</th>
+                        <th>ID</th>
+                        <th>Read</th>
+                        <th>Write</th>
+                        <th>Execute</th>
+                        <th>Administer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="perm in currentTable.permissionList[0]" ng-if="perm.isRecordSpecific == 1">
+                        <td>{{perm.id}}</td>
+                        <td><span ng-if="perm.userID != null">User</span><span ng-if="perm.groupID != null">Group</span></td>
+                        <td><span ng-if="perm.userID != null">{{perm.userID}}</span><span ng-if="perm.groupID != null">{{perm.groupID }}</span></td>
+                        <td><label><input type="checkbox" ng-model="perm.anticRead" ng-true-value="1" ng-false-value="0" class="form-control"><span class="sr-only">Read</span></label></td>
+                        <td><label><input type="checkbox" ng-model="perm.anticWrite" ng-true-value="1" ng-false-value="0" class="form-control"><span class="sr-only">Write</span></label></td>
+                        <td><label><input type="checkbox" ng-model="perm.anticExecute" ng-true-value="1" ng-false-value="0" class="form-control"><span class="sr-only">Execute</span></label></td>
+                        <td><label><input type="checkbox" ng-model="perm.anticAdminister" ng-true-value="1" ng-false-value="0" class="form-control"><span class="sr-only">Administer</span></label></td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </section>
+
+    <section class="row">
+        <div class="col-md-12">
+            <h1>Inhereted / Table-level Permissions</h1>
+
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>PermID</th>
+                    <th>Type</th>
+                    <th>ID</th>
+                    <th>Read</th>
+                    <th>Write</th>
+                    <th>Execute</th>
+                    <th>Administer</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="perm in currentTable.permissionList[0]" ng-if="perm.isRecordSpecific != 1">
+                    <td>{{perm.id}}</td>
+                    <td><span ng-if="perm.userID != null">User</span><span ng-if="perm.groupID != null">Group</span></td>
+                    <td><span ng-if="perm.userID != null">{{perm.userID}}</span><span ng-if="perm.groupID != null">{{perm.groupID }}</span></td>
+                    <td><label><input type="checkbox" ng-model="perm.anticRead" ng-true-value="1" ng-false-value="0" class="form-control" disabled><span class="sr-only">Read</span></label></td>
+                    <td><label><input type="checkbox" ng-model="perm.anticWrite" ng-true-value="1" ng-false-value="0" class="form-control" disabled><span class="sr-only">Write</span></label></td>
+                    <td><label><input type="checkbox" ng-model="perm.anticExecute" ng-true-value="1" ng-false-value="0" class="form-control" disabled><span class="sr-only">Execute</span></label></td>
+                    <td><label><input type="checkbox" ng-model="perm.anticAdminister" ng-true-value="1" ng-false-value="0" class="form-control" disabled><span class="sr-only">Administer</span></label></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
