@@ -13,7 +13,9 @@
       "foreignKeyDisplayFields":["firstName","lastName"]
     },
     "priorityID":{
-	"displayName":"Priority"
+		"displayName":"Priority",
+	    "foreignKeyDisplayFields":["priorityText"]
+
     }
   },
   "listViewDisplayFields": ["person","status","priorityID","projectTypeID","title"]

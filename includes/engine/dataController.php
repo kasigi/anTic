@@ -28,8 +28,9 @@ class anTicData
             // Check System Settings
             if (!$settingsSet) {
                 // The system settings and DB connection values not set. Return Failure.
-                $returnData['error'] = "System Settings File Missing.";
-                return $returnData;
+                $message = "System Settings File Missing.";
+                $output = $this->returnError($message,4);
+                return $output;
             }
 
 
@@ -255,19 +256,19 @@ AND i.TABLE_SCHEMA = DATABASE();";
 // Check for valid request action
         if (!isset($aRequest['action'])) {
             $returnData['error'] = "No action defined";
-            return $returnData;
+            return $this->returnError($returnData['error'],4);
         }
 
 // Check for valid request action
         if (!isset($aRequest['tableName'])) {
             $returnData['error'] = "No tableName defined";
-            return $returnData;
+            return $this->returnError($returnData['error'],4);
         }
 
         $aRequest['action'] = strtolower($aRequest['action']);
         if (!in_array($aRequest['action'], $this->validRequests)) {
             $returnData['error'] = "Invalid Request Type";
-            return $returnData;
+            return $this->returnError($returnData['error'],4);
 
         }
 
@@ -280,7 +281,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
             $this->buildDataModels('system');
             if (!isset($this->dataModels['system'][$aRequest['tableName']])) {
                 $returnData['error'] = "Invalid Table Selected";
-                return $returnData;
+                return $this->returnError($returnData['error'],4);
                 }
         }
             $targetTable = $aRequest['tableName'];
@@ -293,7 +294,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
         foreach ($primaryRecordKeys as $key => $value) {
             if (!in_array($key, $this->dataModels[$dataType][$aRequest['tableName']]['primaryKey'])) {
                 $returnData['error'] = "Invalid Primary Key Request";
-                return $returnData;
+                return $this->returnError($returnData['error'],4);
             }
         }
 
@@ -308,7 +309,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
             foreach ($inputData as $key => $value) {
                 if (!isset($this->dataModels['data'][$aRequest['tableName']]['fields'][$key])) {
                     $returnData['error'] = "Invalid Fields in Data Request";
-                    return $returnData;
+                    return $this->returnError($returnData['error'],4);
                 }
             }
         } else {
@@ -371,9 +372,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
         }
         if(!$anTicUser->checkLogin()){
             // User is not logged in
-            $output['status'] = "error";
-            $output['error'] = "Not logged in";
-            return $output;
+            return $this->returnError("Not Logged In",2);
         }else{
             return true;
         }
@@ -385,7 +384,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
     {
         $loginStatus = $this->dataCheckLogin();
         if($loginStatus !== true){
-            return $loginStatus;
+            return $this->returnError("Not Logged In",2);
+;
         };
 
         $bindArray = [];
@@ -490,13 +490,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
         }
 
         $success = $statement->execute();
-        if (!$success) {
-            $output['status'] = "error";
-            $output['error'] = $statement->errorCode();
-            $output['sqlError'] = $statement->errorInfo();
-            //$output['sql']=$sql;
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+        if(!$success){
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
 
@@ -582,15 +578,15 @@ AND i.TABLE_SCHEMA = DATABASE();";
         global $anTicUser;
         $loginStatus = $this->dataCheckLogin();
         if($loginStatus !== true){
-            return $loginStatus;
+            return $this->returnError("Not Logged In",2);
+
         };
 
         $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
 
         if($permissions['data']['anticRead']!=1){
-            $output['status'] = "error";
-            $output['error'] = "Inadequate permissions or record does not exist";
-            return $output;
+            return $this->returnError("Inadequate permissions or record does not exist",2);
+
         }
 
         $bindArray = [];
@@ -602,12 +598,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
         }
 
         $success = $statement->execute();
-        if (!$success) {
-            $output['status'] = "error";
-            $output['error'] = $statement->errorCode();
-            $output['sqlError'] = $statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+        if(!$success){
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
 
@@ -623,11 +616,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         $success = $statement->execute();
         if(!$success){
-            $output['status']="error";
-            $output['error']=$statement->errorCode();
-            $output['sqlError']=$statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
         // Process Results
@@ -703,11 +693,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         $success = $statement->execute();
         if(!$success){
-            $output['status']="error";
-            $output['error']=$statement->errorCode();
-            $output['sqlError']=$statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
         // Process Results
@@ -738,11 +725,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         $success = $statement->execute();
         if(!$success){
-            $output['status']="error";
-            $output['error']=$statement->errorCode();
-            $output['sqlError']=$statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
         // Process Results
@@ -762,23 +746,22 @@ AND i.TABLE_SCHEMA = DATABASE();";
         global $anTicUser;
         $loginStatus = $this->dataCheckLogin();
         if($loginStatus !== true){
-            return $loginStatus;
+            return $this->returnError("Not Logged In",2);
+
         };
 
         $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
 
         if($permissions['data']['anticWrite']!=1){
-            $output['status'] = "error";
-            $output['error'] = "Inadequate permissions or record does not exist";
-            return $output;
+            return $this->returnError("Inadequate permissions or record does not exist",2);
         }
 
 
         $bindArray = [];
 
         if (count($primaryRecordKeys) == 0) {
-            $returnData['error'] = "Primary Keys Required for Action";
-            return $returnData;
+            return $this->returnError("Primary Keys Required for Action",4);
+
         } else {
             $sql = "DELETE FROM $targetTable";
         }
@@ -793,12 +776,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
         }
 
         $success = $statement->execute();
-        if (!$success) {
-            $output['status'] = "error";
-            $output['error'] = $statement->errorCode();
-            $output['sqlError'] = $statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+        if(!$success){
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
 
@@ -822,28 +802,25 @@ AND i.TABLE_SCHEMA = DATABASE();";
         global $anTicUser;
         $loginStatus = $this->dataCheckLogin();
         if($loginStatus !== true){
-            return $loginStatus;
+            return $this->returnError("Not logged in.",2);
+
         };
 
         $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
 
         if($permissions['data']['anticWrite']!=1){
-            $output['status'] = "error";
-            $output['error'] = "Inadequate permissions or record does not exist";
-            return $output;
+            return $this->returnError("Inadequate permissions or record does not exist",2);
         }
 
         $bindArray = [];
 
         if (count($primaryRecordKeys) == 0) {
-            $returnData['error'] = "Primary Keys Required for Action";
-            return $returnData;
+            return $this->returnError("Primary Keys Required for Action",4);
         } else {
             $sql = "UPDATE $targetTable SET ";
             unset($setArray);
             if (count($inputData) == 0) {
-                $returnData['error'] = "Data must be supplied for the Update Action";
-                return $returnData;
+                return $this->returnError("Data must be supplied for the Update Action",4);
             }
             foreach ($inputData as $key => $value) {
                 $setArray[] = "`" . $key . "`=:" . $key . "DValue";
@@ -865,12 +842,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
         }
 
         $success = $statement->execute();
-        if (!$success) {
-            $output['status'] = "error";
-            $output['error'] = $statement->errorCode();
-            $output['sqlError'] = $statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
-            return $output;
+        if(!$success){
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
 
@@ -899,9 +873,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
         $permissions = $anTicUser->permissionCheck($targetTable);
 
         if($permissions['data']['anticWrite']!=1){
-            $output['status'] = "error";
-            $output['error'] = "Inadequate permissions";
-            return $output;
+            return $this->returnError("Inadequate permissions or record does not exist",2);
         }
         $bindArray = [];
 
@@ -911,8 +883,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
         unset($setArray);
         unset($setArrayFields);
         if (count($inputData) == 0) {
-            $returnData['error'] = "Data must be supplied for the Update Action";
-            return $returnData;
+            return $this->returnError("Data must be supplied for the Update Action",4);
+
         }
         foreach ($inputData as $key => $value) {
             $setArrayFields[] = "`" . $key . "`";
@@ -931,13 +903,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
         }
 
         $success = $statement->execute();
-        if (!$success) {
-            $output['status'] = "error";
-            $output['error'] = $statement->errorCode();
-            $output['sqlError'] = $statement->errorInfo();
-            $output['sqlError']['sql']=$sql;
-            return $output;
-
+        if(!$success){
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            return $this->returnError($errorArr,3);
         }
 
 
@@ -953,6 +921,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         $output['insertedID'] = $this->db->lastInsertId();
 
+        $this->returnError("Added record ".$output['insertedID']." to table ".$targetTable,3);
         // Return Results
         return $output;
 
@@ -1038,11 +1007,9 @@ AND i.TABLE_SCHEMA = DATABASE();";
         $output = null;
        // $output['sql']=$sql;
        // $output['pkBind']=$primaryKeys;
-        if (!$success) {
-            $output['status'] = "error";
-            $output['error'] = $statement->errorCode();
-            $output['sqlError'] = $statement->errorInfo();
-            //$output['sqlError']['sql']=$sql;
+        if(!$success){
+            $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+            $output = $this->returnError($errorArr,3);
         }else{
             $output['status'] = "success";
             while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -1064,8 +1031,37 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
 
 
-    function returnError($message)
-    {
+    function returnError($message,$errorType) {
+
+
+        $this->initDB();
+        if(!isset($errorType)){
+            $errorType = 4;
+        }
+
+        if(!isset($_SESSION['userID'])){
+            $userID = 0;
+        }else{
+            $userID = $_SESSION['userID'];
+        }
+
+        $sql = "INSERT INTO anticSystemLog (eventTypeID,eventDesc,userID,sourceIP) VALUES (:eventTypeID,:eventDesc,:userID,:sourceIP)";
+        $statement = $this->db->prepare($sql);
+        $statement->bindValue(":eventTypeID", $errorType);
+        $statement->bindValue(":eventDesc", $message);
+        $statement->bindValue(":userID", $userID );
+        $statement->bindValue(":sourceIP", $_SERVER['REMOTE_ADDR']);
+
+        $statement->execute();
+        while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $output['status'] = "success";
+            $output['data'][] = $data;
+            //$output['sql']=$sql;
+        }
+
+        $output['status']="error";
+        $output['errorType']=$errorType;
+        return $output;
 
     }// end returnError
 

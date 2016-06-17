@@ -42,6 +42,10 @@ CREATE TABLE IF NOT EXISTS `anticSystemLogEventType` (
   PRIMARY KEY (`eventTypeID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `anTicketer`.`anticSystemLogEventType` (`eventTypeID`, `eventDescription`) VALUES ('1', 'Login Success');
+INSERT INTO `anTicketer`.`anticSystemLogEventType` (`eventTypeID`, `eventDescription`) VALUES ('2', 'Login Fail / No Authentication');
+INSERT INTO `anTicketer`.`anticSystemLogEventType` (`eventTypeID`, `eventDescription`) VALUES ('3', 'SQL Error');
+INSERT INTO `anTicketer`.`anticSystemLogEventType` (`eventTypeID`, `eventDescription`) VALUES ('4', 'General Error');
 
 
 

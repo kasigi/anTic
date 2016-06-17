@@ -6,7 +6,7 @@ $anTicData = new anTicData;
 $anTicUser = new anTicUser;
 
 if(!$anTicUser->checkLogin()){
-    echo "Not logged in";
+    $anTicData->returnError("Not logged in",2);
     die;
 }
 
@@ -18,14 +18,14 @@ if($_REQUEST['tableName']!=""){
     $permissions = $anTicUser->permissionCheck($_REQUEST['tableName']);
 
     if($permissions['data']['anticRead']!=1){
-        echo "Not allowed to read table";
+        $anTicData->returnError("Not allowed to read table",2);
         die;
     }
 
     $targetTable = preg_replace("/[^a-zA-Z0-9\-_\.]/", "", $_REQUEST['tableName']);
 
     if(!array_key_exists($targetTable,$models)){
-        echo "Invalid Selection";
+        $anTicData->returnError("CSV Download invalid selection",4);
         exit;
     }
     $fileName = $targetTable.".csv";

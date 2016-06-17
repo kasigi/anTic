@@ -128,6 +128,7 @@ class anTicUser {
  */
     function login($userEmail,$password){
         if($userEmail == "" || $password == ""){
+            $this->returnError("Not logged in.",2);
             return false;
         }
 
@@ -154,12 +155,15 @@ class anTicUser {
             $_SESSION['userMeta'] = [];
             $_SESSION['userMeta']['firstName'] = $data['firstName'];
             $_SESSION['userMeta']['lastName'] = $data['lastName'];
+            $this->returnError("Login Success",1);
+
         } else {
             // If they fail, unset fullyAuthenticated and session user id return false
             $_SESSION['fullyAuthenticated'] = false;
             unset($_SESSION['userID']);
             unset($_SESSION['userMeta']);
-            $output['status'] = "error";
+            $this->returnError("Login failed.",2);
+
         }
 
 
@@ -184,7 +188,7 @@ class anTicUser {
             $userID = intval($userID);
 
             if($userID <=0){
-                return false;
+                return $this->returnError("Not logged in.",2);
             }
         }
         if(!isset($password) || $password == ""){
@@ -196,6 +200,8 @@ class anTicUser {
             $permissions = $this->permissionCheck("anticUser");
             if(!isset($permissions['data']['anticWrite']) || $permissions['data']['anticWrite']!=1) {
                 // User does not have admin power over user table
+                return $this->returnError("Inadequate permissions or record does not exist",2);
+
                 return false;
             }
         }
@@ -244,7 +250,7 @@ class anTicUser {
         }else{
             $userID = intval($userID);
             if($userID <=0){
-                return false;
+                return $this->returnError("Not logged in.",2);
             }
         }
         $this->initDB();
@@ -297,7 +303,7 @@ AND P.userID = :userID) as PMU;";
         }else{
             $userID = intval($userID);
             if($userID <=0){
-                return false;
+                return $this->returnError("Not logged in.",2);
             }
         }
 
@@ -337,7 +343,39 @@ AND P.userID = :userID) as PMU;";
 
 
 
+    function returnError($message,$errorType) {
 
+
+        $this->initDB();
+        if(!isset($errorType)){
+            $errorType = 2;
+        }
+
+        if(!isset($_SESSION['userID'])){
+            $userID = 0;
+        }else{
+            $userID = $_SESSION['userID'];
+        }
+
+        $sql = "INSERT INTO anticSystemLog (eventTypeID,eventDesc,userID,sourceIP) VALUES (:eventTypeID,:eventDesc,:userID,:sourceIP)";
+        $statement = $this->db->prepare($sql);
+        $statement->bindValue(":eventTypeID", $errorType);
+        $statement->bindValue(":eventDesc", $message);
+        $statement->bindValue(":userID", $userID );
+        $statement->bindValue(":sourceIP", $_SERVER['REMOTE_ADDR']);
+
+        $statement->execute();
+        while ($data = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $output['status'] = "success";
+            $output['data'][] = $data;
+            //$output['sql']=$sql;
+        }
+
+        $output['status']="error";
+        $output['errorType']=$errorType;
+        return $output;
+
+    }// end returnError
 
 
 
