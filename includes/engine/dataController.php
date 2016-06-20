@@ -38,6 +38,7 @@ class anTicData
             $this->db = new PDO("mysql:host=" . $dbAuth['addr'] . ";port=" . $dbAuth['port'] . ";dbname=" . $dbAuth['schema'] . ";charset=utf8mb4", $dbAuth['user'], $dbAuth['pw']);
 
         }
+        return $this->db;
     }
 
 
@@ -391,9 +392,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
     function dataGetAll($targetTable)
     {
         $loginStatus = $this->dataCheckLogin();
-        if($loginStatus !== true){
+        if($loginStatus['status'] == "error"){
             return $this->returnError("Not Logged In",2);
-;
         };
 
         $bindArray = [];
@@ -1132,6 +1132,8 @@ AND i.TABLE_SCHEMA = DATABASE();";
 
         $this->returnError("User ".$_SESSION['userID']." has changed permissions for $targetTable ($primaryRecordKeys)");
 
+        $output['status'] = "success";
+        return $output;
     }//setPermission
 
 

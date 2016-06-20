@@ -96,7 +96,7 @@ angular.module('anTic')
             var orderBy = $filter('orderBy');
             $scope.predicate = '';
             $scope.reverse = true;
-        }// end initial run tasks
+        };// end initial run tasks
 
 
 
@@ -125,14 +125,14 @@ angular.module('anTic')
                     }
                 });
             }
-        }// end initialSelectTable
+        };// end initialSelectTable
 
 
         $scope.editAllRecord = function () {
             $scope.displayMode = "table";
             $location.search('specificRecord', null);
             $scope.selectTable();
-        }// end editAllRecord
+        };// end editAllRecord
 
 
         $scope.editSingleRecord = function (dataRowID) {
@@ -141,7 +141,7 @@ angular.module('anTic')
             $scope.getRecord(dataRowID);
             $scope.getVersionRecord(dataRowID);
             // Build Primary Key Array to Get ONE record
-        }// end editSingleRecord
+        };// end editSingleRecord
 
 
         $scope.setDisplayCount = function (displayCount) {
@@ -161,7 +161,7 @@ angular.module('anTic')
             $scope.calculatePagination();
             $location.search('displayCount', displayCount);
 
-        }//end setDisplayCount
+        };//end setDisplayCount
 
 
         $scope.checkDisplayOffsetAgainstRecordCount = function () {
@@ -171,7 +171,7 @@ angular.module('anTic')
                 $location.search('displayOffset', 0);
             }
 
-        }//checkDisplayOffsetAgainstRecordCount
+        };//checkDisplayOffsetAgainstRecordCount
 
 
         $scope.setDisplayOffset = function (displayOffset) {
@@ -184,7 +184,7 @@ angular.module('anTic')
             $location.search('displayOffset', displayOffset);
             $scope.getAllForTableData($scope.currentTableSelected);
 
-        }//setDisplayOffset
+        };//setDisplayOffset
 
 
         $scope.calculatePagination = function () {
@@ -196,7 +196,7 @@ angular.module('anTic')
                     $scope.paginationOptions.push(q * $scope.displayCount);
                 }
             }
-        }// end calculatePagination
+        };// end calculatePagination
 
 
         $scope.getForeignKeyDisplayFieldsForRecordField = function (fieldName, fieldValue) {
@@ -213,7 +213,7 @@ angular.module('anTic')
 
                     if (fkData[fkMatchColumn] == fieldValue) {
 
-                        for (i = 0; i < $scope.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields.length; i++) {
+                        for (var i = 0; i < $scope.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields.length; i++) {
                             thisField = $scope.currentTable.dataModel.fields[fieldName].foreignKeyDisplayFields[i];
                             outputArray.push(fkData[thisField]);
                         }
@@ -225,7 +225,7 @@ angular.module('anTic')
             } else {
                 return fieldValue;
             }
-        }//getForeignKeyDisplayFieldsForRecordField
+        };//getForeignKeyDisplayFieldsForRecordField
 
 
         // Function Select Table Data
@@ -237,7 +237,7 @@ angular.module('anTic')
             $scope.recordEditPending = [];
             $scope.recordDeletePending = [];
             $scope.getAllForTableData(this.currentTableSelected, callback);
-        }// end selectTable
+        };// end selectTable
 
 
         $scope.fieldType = function (fieldName, tableName) {
@@ -268,7 +268,7 @@ angular.module('anTic')
 
                 return "text";
             }
-        }
+        };
 
         // Function Load Table Data
         $scope.getAllForTableData = function (tableName, callback) {
@@ -325,14 +325,14 @@ angular.module('anTic')
                 if (callback) {
                     callback();
                 }
-                ;
+
                 console.log($scope.currentTable);
 
             });
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
-        }// end getAllForTableData
+        };// end getAllForTableData
 
 
         $scope.setRecordEditPending = function (dataRowID) {
@@ -341,7 +341,7 @@ angular.module('anTic')
                 $scope.recordEditPending.push(dataRowID);
             }
             //return "ant-entry-editPending";
-        }// end recordEditPending
+        };// end recordEditPending
 
 
         $scope.getRecord = function (dataRowID) {
@@ -408,7 +408,7 @@ console.log($scope.currentTable);
 
 
 
-        }// end getRecord
+        };// end getRecord
 
 
         $scope.getVersionRecord = function (dataRowID) {
@@ -442,7 +442,7 @@ console.log($scope.currentTable);
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
-        }// end getRecord
+        };// end getRecord
 
 
         $scope.getVersion = function (dataRowID, versionID) {
@@ -480,7 +480,7 @@ console.log($scope.currentTable);
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
-        }// end getVersion
+        };// end getVersion
 
 
         $scope.saveRecord = function (dataRowID) {
@@ -564,14 +564,14 @@ console.log($scope.currentTable);
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
-        }
+        };// end saveRecord
 
 
         $scope.saveAllPendingEdits = function () {
             for (var s = 0; s < $scope.recordEditPending.length; s++) {
                 $scope.saveRecord($scope.recordEditPending[s]);
             }
-        }
+        };// saveAllPendingEdits
 
 
         $scope.addRecord = function () {
@@ -618,7 +618,7 @@ console.log($scope.currentTable);
              $scope.currentTable.pkdata.push(newPKRecord) - 1;
              */
 
-        }// end addRecord
+        };// end addRecord
 
 
         $scope.recordPrepareDelete = function (dataRowID) {
@@ -627,7 +627,7 @@ console.log($scope.currentTable);
                 $scope.recordDeletePending.push(dataRowID);
             }
 
-        } //recordPrepareDelete
+        };//recordPrepareDelete
 
 
         $scope.deleteRecord = function (dataRowID) {
@@ -675,7 +675,7 @@ console.log($scope.currentTable);
             }
 
 
-        }// end deleteRecord
+        };// end deleteRecord
 
 
         $scope.rekeyPKData = function () {
@@ -691,20 +691,20 @@ console.log($scope.currentTable);
             }
             $scope.currentTable.pkdata = newPKData;
 
-        }//rekeyPKData
+        };//rekeyPKData
 
 
         $scope.savePermission = function(dataRowID,permRowID){
             // pkSet
             // tableName
 
-        }
+        };// end savePermission
 
         // Run initializations
 
         if($rootScope.userMeta == null){
 
-        }
+        };
 
         $scope.initialRun();
 
@@ -739,7 +739,7 @@ console.log($rootScope.userMeta );
             responsePromise.error(function (data, status, headers, config) {
                 alert("AJAX failed!");
             });
-        }// end whoami
+        };// end whoami
 
         $scope.whoami();
 
@@ -770,7 +770,7 @@ console.log($rootScope.userMeta );
             });
 
             $scope.userCredentials.password = "";
-        }// end login
+        };// end login
 
         $scope.logout = function () {
             var crData = {};
@@ -789,7 +789,7 @@ console.log($rootScope.userMeta );
             });
 
             $scope.userCredentials.password = "";
-        }// end logout
+        };// end logout
 
     })
     .controller("SystemController", function ($scope, $rootScope,$route, $location, $routeParams, $http, $filter) {

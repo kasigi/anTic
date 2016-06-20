@@ -39,6 +39,7 @@ class anTicUser {
             $this->db = new PDO("mysql:host=" . $dbAuth['addr'] . ";port=" . $dbAuth['port'] . ";dbname=" . $dbAuth['schema'] . ";charset=utf8mb4", $dbAuth['user'], $dbAuth['pw']);
 
         }
+        return $this->db;
     } // end initDB
 
 /*
@@ -204,7 +205,6 @@ class anTicUser {
                 // User does not have admin power over user table
                 return $this->returnError("Inadequate permissions or record does not exist",2);
 
-                return false;
             }
         }
         // Connect DB
