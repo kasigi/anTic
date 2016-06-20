@@ -5,7 +5,7 @@ class anTicData
 
     public $db;
     public $dataModels;
-    public $validRequests = array("get","getversion", "getversionlog","getall", "set", "delete", "add","buildmodels","getpermissionlist");
+    public $validRequests = array("get","getversion", "getversionlog","getall", "set", "delete", "add","buildmodels","getpermissionlist","setpermission");
     public $validDataModelTypes = array("data", "system");
     public $permissionFieldNames = array("anticRead","anticWrite","anticExecute","anticAdminister");
 
@@ -978,7 +978,7 @@ AND i.TABLE_SCHEMA = DATABASE();";
     }// end addLimitsToQuery
 
 
-    function getPermissionList($tableName,$primaryKeys){
+    function getPermissionList($targetTable,$primaryKeys){
         if(isset($primaryKeys)){
             $pkArrayBaseJsonWhere = " OR pkArrayBaseJson = :pkJSON";
         }else{
@@ -1001,13 +1001,13 @@ AND i.TABLE_SCHEMA = DATABASE();";
         $this->initDB();
         $statement = $this->db->prepare($sql);
 
-        $statement->bindValue(':tableName', $tableName);
+        $statement->bindValue(':tableName', $targetTable);
 
-        if(isset($primaryKeys)) {
-            if(is_array($primaryKeys)){
-                $primaryKeys = json_encode($primaryKeys);
+        if(isset($primaryRecordKeys)) {
+            if(is_array($primaryRecordKeys)){
+                $primaryRecordKeys = json_encode($primaryRecordKeys);
             }
-            $statement->bindValue(':pkJSON', $primaryKeys);
+            $statement->bindValue(':pkJSON', $primaryRecordKeys);
         }
 
         $success = $statement->execute();
@@ -1036,7 +1036,103 @@ AND i.TABLE_SCHEMA = DATABASE();";
     }// getPermissionList
 
 
+    function setPermission($targetTable,$primaryRecordKeys,$userID,$groupID,$permissionSet){
 
+        global $anTicUser;
+        $loginStatus = $this->dataCheckLogin();
+        if($loginStatus !== true){
+            return $this->returnError("Not logged in.",2);
+
+        };
+
+        // Verify that user has admin powers over this object
+        $permissions = $anTicUser->permissionCheck($targetTable,$primaryRecordKeys);
+        if($permissions['data']['anticWrite']!=1){
+            return $this->returnError("Inadequate permissions or record does not exist",2);
+        }
+
+        if($targetTable==""){
+            return $this->returnError("You must specify a target table to set permissions",4);
+        }
+
+
+        // Create the SQL to-do list
+        $sql = [];
+        $sql[0] = "DELETE FROM anticPermission WHERE ";
+        $sql[1] = "INSERT INTO anticPermission (userID,groupID,tableName,pkArrayBaseJson,`read`,`write`,`execute`,`administer`) VALUES (:userID,:groupID,:tableName,:pkArrayBaseJson,:read,:write,:execute,:administer)";
+        $bindArray = [];
+
+        // Check for primary key specification
+        if(isset($primaryRecordKeys) && $primaryRecordKeys!=null) {
+            if(is_array($primaryRecordKeys)){
+                $primaryRecordKeys = json_encode($primaryRecordKeys);
+            }
+
+            $sql[0] .= " pkArrayBaseJson = :pkArrayBaseJson ";
+            $bindArray['pkArrayBaseJson']=$primaryRecordKeys;
+        }else{
+            $sql[0] .= " pkArrayBaseJson IS NULL ";
+            $bindArray['pkArrayBaseJson'] = null;
+        }
+
+
+        // Build out the permission Set
+        if(!isset($permissionSet)){
+            return $this->returnError("Attempted to set permissions for $targetTable ($primaryRecordKeys) but did not specify permissions array",4);
+        }else{
+            $permissionSetDefault['read']=0;
+            $permissionSetDefault['write']=0;
+            $permissionSetDefault['execute']=0;
+            $permissionSetDefault['administer']=0;
+            if(!is_array($permissionSet)){
+                $permissionSet = $permissionSetDefault;
+            }else{
+                foreach($permissionSetDefault as $key=>$value){
+                    if(!isset($permissionSet[$key])){
+                        $permissionSet[$key] = $value;
+                    }
+                }
+            }
+        }
+
+        foreach($permissionSetDefault as $permType => $permDefValue){
+            $sql[0] .= " AND $permType = :$permType ";
+            $bindArray[$permType] = $permissionSet[$permType];
+        }
+
+        if(intval($userID)<=0){
+            $userID = null;
+        }
+        $bindArray['userID'] = $userID;
+        $sql[0] .= " AND userID = :userID ";
+
+
+        if(intval($groupID)<=0){
+            $groupID = null;
+        }
+        $bindArray['groupID'] = $groupID;
+        $sql[0] .= " AND groupID = :groupID ";
+
+        $sql[0] .= " AND tableName = :tableName ";
+        $bindArray['tableName']=$targetTable;
+
+
+        $this->initDB();
+        foreach($sql as $sqlQuery){
+            $statement = $this->db->prepare($sqlQuery);
+            foreach($bindArray as $bKey => $bValue){
+                $statement->bindValue(":".$bKey,$bValue);
+            }
+            $success = $statement->execute();
+            if(!$success){
+                $errorArr = json_encode(array($statement->errorCode(),$statement->errorInfo()));
+                return $this->returnError($errorArr,3);
+            }
+        }
+
+        $this->returnError("User ".$_SESSION['userID']." has changed permissions for $targetTable ($primaryRecordKeys)");
+
+    }//setPermission
 
 
     function returnError($message,$errorType) {

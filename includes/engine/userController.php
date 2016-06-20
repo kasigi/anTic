@@ -4,7 +4,7 @@
 class anTicUser {
 
     public $db;
-    public $validRequests = array("login","logout","setpassword","whoami","listgroups");
+    public $validRequests = array("login","logout","setpassword","whoami","listgroups","listusers");
 
     function anTicUser(){
 
@@ -74,6 +74,7 @@ class anTicUser {
         $returnArr['email'] = $aRequest['email'];
         $returnArr['password'] = $aRequest['password'];
         $returnArr['groupIDs'] = $aRequest['groupIDs'];
+        $returnArr['userIDs'] = $aRequest['userIDs'];
 
         return $returnArr;
 
@@ -170,6 +171,7 @@ class anTicUser {
         return $output;
 
     }// end login
+
 
 
 /*
@@ -334,12 +336,90 @@ AND P.userID = :userID) as PMU;";
         }else{
             while ($data = $statement->fetchAll(PDO::FETCH_ASSOC)) {
                 $output['status'] = "success";
+                $output['data'] = $data;
+            }
+        }
+        return $output;
+    }//listGroups
+
+
+
+    function listUsers($userIDs,$groupIDs){
+        if(!isset($userID)){
+            $userID = $_SESSION['userID'];
+        }else{
+            $userID = intval($userID);
+            if($userID <=0){
+                return $this->returnError("Not logged in.",2);
+            }
+        }
+
+        $where = [];
+        if($userIDs != ""){
+            // Scan input for acceptable values
+            if(is_array($userIDs)){
+                foreach($userIDs as $key=>$value){
+                    $userIDs[$key] = intval($value);
+                }
+                $userIDs = implode(",",$userIDs);
+            }
+
+
+                $userIDs  = preg_replace("/[^0-9,]/", "", $userIDs);
+
+            // If there is still valid input after the filtering
+            if($userIDs!=""){
+                $where[] = " U.userID in ($userIDs)";
+            }
+        }
+
+        if($groupIDs != ""){
+            // Scan input for acceptable values
+            if(is_array($groupIDs)){
+                foreach($groupIDs as $key=>$value){
+                    $groupIDs[$key] = intval($value);
+                }
+                $groupIDs = implode(",",$groupIDs);
+            }
+
+            $groupIDs  = preg_replace("/[^0-9,]/", "", $groupIDs);
+
+
+            // If there is still valid input after the filtering
+            if($groupIDs!=""){
+                $groupJoin = " LEFT JOIN anticUserGroup G on U.userID = G.userID ";
+                $where[] = " G.groupID in ($groupIDs)";
+            }
+        }else{
+            $groupJoin = null;
+        }
+
+
+        // Build the SQL
+        $sql = "SELECT * FROM anticUser U $groupJoin";
+        if(count($where)>0){
+            $sql .= " WHERE ". implode(" AND ",$where);
+        }
+
+        $this->initDB();
+        $statement = $this->db->prepare($sql);
+        $success = $statement->execute();
+
+        if (!$success) {
+            $output['status'] = "error";
+            $output['error'] = $statement->errorCode();
+            $output['sqlError'] = $statement->errorInfo();
+        }else{
+            while ($data = $statement->fetchAll(PDO::FETCH_ASSOC)) {
+                $output['status'] = "success";
 
                 $output['data'] = $data;
             }
         }
+        return $output;
 
     }//listGroups
+
 
 
 

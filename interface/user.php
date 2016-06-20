@@ -38,6 +38,13 @@ if($requestedActionInputs['action'] == "listgroups"){
 }//listgroups
 
 
+if($requestedActionInputs['action'] == "listusers"){
+    $response = $anTicUser->listUsers($requestedActionInputs['userIDs'],$requestedActionInputs['groupIDs']);
+
+    echo json_encode($response);
+}//listgroups
+
+
 if($requestedActionInputs['action'] == "setpassword"){
     $response = $anTicUser->setPassword(null,$requestedActionInputs['password']);
 

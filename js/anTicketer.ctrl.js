@@ -694,7 +694,11 @@ console.log($scope.currentTable);
         }//rekeyPKData
 
 
+        $scope.savePermission = function(dataRowID,permRowID){
+            // pkSet
+            // tableName
 
+        }
 
         // Run initializations
 
