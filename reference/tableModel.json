@@ -12,14 +12,5 @@
       }
     },
     "listViewDisplayFields": ["person","status","projectTypeID","title"],
-  "hasManyToMany":{
-    "fieldName":{
-      "helpText":"",
-      "displayName":"SampleDisplayName",
-      "foreignKeyDisplayFields":["fkField1","fkField2"],
-      "foreignTable":"Foreign Table",
-      "throughTable":"Tie Table"
-    }
-  },
-  "showChildForeignKeys":[]
+    "showChildForeignKeys":[]
 }
