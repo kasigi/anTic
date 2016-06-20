@@ -63,8 +63,16 @@ class anTicData
                 foreach ($files as $file) {
                     $tableName = basename($file, ".json");
                     $this->dataModels[$dataType][$tableName] = json_decode(file_get_contents($file), true);
+
+                    // Set default table display name
                     if (!isset($this->dataModels[$dataType][$tableName]['displayName'])) {
                         $this->dataModels[$dataType][$tableName]['displayName'] = $tableName;
+                    }
+
+                    // Set default table display in list status
+
+                    if (!isset($this->dataModels[$dataType][$tableName]['suppressFromTableList'])) {
+                        $this->dataModels[$dataType][$tableName]['suppressFromTableList'] = false;
                     }
 
                     if (isset($this->dataModels[$dataType][$tableName]['listViewDisplayFields'])) {
