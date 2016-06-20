@@ -60,8 +60,10 @@ angular.module('anTic')
                 $scope.tableList = [];
                 $scope.tableIndex = [];
                 jQuery.each(data, function (index, value) {
-                    $scope.tableList.push({"tableName": index, "displayName": value.displayName});
-                    $scope.tableIndex.push(index);
+                    if(value.suppressFromTableList == false){
+                        $scope.tableList.push({"tableName": index, "displayName": value.displayName});
+                        $scope.tableIndex.push(index);
+                    }
                 });
 
                 // Get initial current table selection

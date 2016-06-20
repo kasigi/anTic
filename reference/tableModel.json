@@ -1,6 +1,7 @@
 {
     "displayName":"",
     "description":"",
+    "suppressFromTableList":false,
     "fields":{
       "fieldName":{
         "helpText":"",
