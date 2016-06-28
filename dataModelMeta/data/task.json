@@ -12,12 +12,17 @@
       "displayName":"Assigned Person",
       "foreignKeyDisplayFields":["firstName","lastName"]
     },
+    "projectID":{
+      "helpText":"This is the project that this ticket relates to",
+      "displayName":"Project",
+      "foreignKeyDisplayFields":["title"]
+    },
     "priorityID":{
 		"displayName":"Priority",
 	    "foreignKeyDisplayFields":["priorityText"]
 
     }
   },
-  "listViewDisplayFields": ["person","status","priorityID","projectTypeID","title"]
+  "listViewDisplayFields": ["person","projectID","status","priorityID","projectTypeID","title"]
 
 }
